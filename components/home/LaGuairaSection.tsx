@@ -193,6 +193,24 @@ export default function LaGuairaSection({ lang }: LaGuairaSectionProps) {
             </div>
           </div>
         </div>
+
+        {/* Frame 4: Gratitude */}
+        <div className="flex flex-col items-center justify-center w-full">
+          <div className="max-w-2xl text-center">
+            <Heart className="w-8 h-8 text-sc-primary/60 fill-sc-primary/30 mx-auto mb-6" />
+            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-5">
+              {lang.laguaira_gratitude_title}
+            </h3>
+            <p className="text-base sm:text-lg text-white/60 leading-relaxed mb-8">
+              {lang.laguaira_gratitude_text}
+            </p>
+            <div className="flex items-center justify-center gap-2 text-sm text-white/30">
+              <div className="h-px w-12 bg-white/10" />
+              <span className="font-mono text-xs tracking-widest uppercase">{lang.laguaira_memorial}</span>
+              <div className="h-px w-12 bg-white/10" />
+            </div>
+          </div>
+        </div>
       </ScrollyFrames>
 
       {/* Lightbox */}
