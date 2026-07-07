@@ -1165,16 +1165,28 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
             } else if (p.type === "slow") {
               slowMoRef.current = 3000
             } else if (p.type === "heart") {
-              livesRef.current = Math.min(MAX_LIVES, livesRef.current + 1)
-              setDisplayLives(livesRef.current)
+              if (livesRef.current >= MAX_LIVES) {
+                gunPointsRef.current += 2
+                spawnFloatingText(p.x, p.y - 30, "+2 🔫 GUN!", "#FFD700", 22)
+              } else {
+                livesRef.current = Math.min(MAX_LIVES, livesRef.current + 1)
+                setDisplayLives(livesRef.current)
+                gunPointsRef.current += 1
+              }
             } else if (p.type === "double") {
               doublePointsRef.current = 8000
+              gunPointsRef.current += 1
+            } else if (p.type === "gun") {
+              gunPointsRef.current += 2
+              spawnFloatingText(p.x, p.y - 30, "+2 🔫 GUN!", "#FFD700", 22)
+            } else {
+              gunPointsRef.current += 1
             }
-            gunPointsRef.current += p.type === "gun" ? 2 : 1
             if (gunPointsRef.current >= 8) {
               gunRef.current = 8000
               gunPointsRef.current = 0
               gunBarRef.current = 0
+              spawnFloatingText(p.x, p.y - 50, "🔫 GUN ACTIVATED!", "#FFD700", 26)
             }
             comboRef.current++
             displayComboRef.current = comboRef.current
