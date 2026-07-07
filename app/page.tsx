@@ -10,6 +10,7 @@ import PricingSection from "@/components/home/PricingSection"
 import BlogSection from "@/components/home/BlogSection"
 import LaGuairaSection from "@/components/home/LaGuairaSection"
 import ContactSection from "@/components/home/ContactSection"
+import GratitudeSection from "@/components/home/GratitudeSection"
 import UnderConstruction from "@/components/ui/under-construction"
 
 const baseUrl = "https://spacecatweb.com"
@@ -113,6 +114,7 @@ export default async function HomePage({
       <BlogSection lang={lang} />
       <LaGuairaSection lang={lang} />
       <ContactSection lang={lang} />
+      <GratitudeSection lang={lang} />
       <UnderConstruction lang={lang} />
     </>
   )
