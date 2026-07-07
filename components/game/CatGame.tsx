@@ -1068,6 +1068,16 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
               setDisplayScore(scoreRef.current)
               spawnFloatingText(m.x, m.y - 30, "+5 COMBO!", "#FFD700", 32)
               if (!muteRef.current) playSound(audioCtxRef.current, "dodge")
+              if (gunRef.current > 0) {
+                gunBarRef.current += 0.12
+                if (gunBarRef.current >= 1) {
+                  gunBarRef.current = 0
+                  gunLevelRef.current++
+                  levelFlashRef.current = 500
+                  spawnFloatingText(w / 2, h * 0.42, `LVL UP GUN LV${gunLevelRef.current}`, "#FFD700", 26)
+                  if (!muteRef.current) playSound(audioCtxRef.current, "combo")
+                }
+              }
               break
             }
           }
@@ -1166,19 +1176,20 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
               slowMoRef.current = 3000
             } else if (p.type === "heart") {
               if (livesRef.current >= MAX_LIVES) {
-                gunPointsRef.current += 2
-                spawnFloatingText(p.x, p.y - 30, "+2 🔫 GUN!", "#FFD700", 22)
+                gunPointsRef.current += 4
+                spawnFloatingText(p.x, p.y - 30, "+4 🔫 GUN!", "#FFD700", 22)
               } else {
                 livesRef.current = Math.min(MAX_LIVES, livesRef.current + 1)
                 setDisplayLives(livesRef.current)
-                gunPointsRef.current += 1
+                gunPointsRef.current += 4
+                spawnFloatingText(p.x, p.y - 30, "+4 🔫 GUN!", "#FFD700", 22)
               }
             } else if (p.type === "double") {
               doublePointsRef.current = 8000
               gunPointsRef.current += 1
             } else if (p.type === "gun") {
-              gunPointsRef.current += 2
-              spawnFloatingText(p.x, p.y - 30, "+2 🔫 GUN!", "#FFD700", 22)
+              gunPointsRef.current += 4
+              spawnFloatingText(p.x, p.y - 30, "+4 🔫 GUN!", "#FFD700", 22)
             } else {
               gunPointsRef.current += 1
             }
@@ -1296,32 +1307,30 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
         ctx.fillStyle = "#FFD700"
         ctx.fillText(`LV ${prevTierRef.current + 1}`, 16, 54)
 
-        const gunBarX = 16
-        const gunBarY = 64
-        const gunBarW = 100
-        const gunBarH = 8
-        ctx.fillStyle = "rgba(0, 0, 0, 0.5)"
-        ctx.fillRect(gunBarX, gunBarY, gunBarW, gunBarH)
-        if (gunRef.current > 0) {
-          const fill = gunBarRef.current
-          ctx.fillStyle = "#FFD700"
-          ctx.fillRect(gunBarX, gunBarY, gunBarW * fill, gunBarH)
+        const gunBarTotalW = 180
+        const gunBarX = (w - gunBarTotalW) / 2
+        const gunBarY = h - 40
+        const gunBarH = 10
+        const pointW = (gunBarTotalW - 16) / 8
+        const pointGap = 2
+        ctx.fillStyle = "rgba(0, 0, 0, 0.6)"
+        ctx.fillRect(gunBarX, gunBarY, gunBarTotalW, gunBarH + 4)
+        for (let i = 0; i < 8; i++) {
+          const px = gunBarX + 4 + i * (pointW + pointGap)
+          const filled = i < gunPointsRef.current
+          ctx.fillStyle = filled ? "#FFD700" : "rgba(255, 215, 0, 0.2)"
+          ctx.fillRect(px, gunBarY + 2, pointW, gunBarH)
           ctx.strokeStyle = "#FFD700"
           ctx.lineWidth = 1
-          ctx.strokeRect(gunBarX, gunBarY, gunBarW, gunBarH)
-          ctx.font = "bold 9px 'Courier New', monospace"
-          ctx.fillStyle = "#FFFFFF"
-          ctx.fillText(`GUN LV${gunLevelRef.current}`, gunBarX + gunBarW + 6, gunBarY + 7)
+          ctx.strokeRect(px, gunBarY + 2, pointW, gunBarH)
+        }
+        ctx.font = "bold 10px 'Courier New', monospace"
+        ctx.fillStyle = "#FFFFFF"
+        ctx.textAlign = "center"
+        if (gunRef.current > 0) {
+          ctx.fillText(`🔫 LV${gunLevelRef.current} — ${Math.ceil(gunRef.current / 1000)}s`, w / 2, gunBarY - 4)
         } else {
-          const fill = gunPointsRef.current / 8
-          ctx.fillStyle = "#F39C12"
-          ctx.fillRect(gunBarX, gunBarY, gunBarW * fill, gunBarH)
-          ctx.strokeStyle = "#F39C12"
-          ctx.lineWidth = 1
-          ctx.strokeRect(gunBarX, gunBarY, gunBarW, gunBarH)
-          ctx.font = "bold 9px 'Courier New', monospace"
-          ctx.fillStyle = "#FFFFFF"
-          ctx.fillText(`🔫 ${gunPointsRef.current}/8  LV${gunLevelRef.current}`, gunBarX + gunBarW + 6, gunBarY + 7)
+          ctx.fillText(`🔫 ${gunPointsRef.current}/8  LV${gunLevelRef.current}`, w / 2, gunBarY - 4)
         }
 
         const diffBarX = 16
