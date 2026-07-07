@@ -69,7 +69,9 @@ export async function POST(request: Request) {
     }
 
     await Promise.all([
-      saveMessage(name, email, country, whatsapp, message),
+      saveMessage(name, email, country, whatsapp, message).catch((e) => {
+        console.error("Failed to save message to DB:", e)
+      }),
       sendEmail(name, email, country, whatsapp, message),
       sendToTelegram(name, email, country, whatsapp, message),
     ])

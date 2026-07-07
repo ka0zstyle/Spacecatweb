@@ -168,14 +168,16 @@ export default function HeroSection({ lang }: HeroSectionProps) {
     const maxFrontDist = Math.max(...frontOffsets.map(o => o.dist)) || 1
 
     // ── Text Scramble (works on individual spans, not parent) ──────────────
+    const scrambleTimers: ReturnType<typeof setTimeout>[] = []
     function scrambleGroup(chars: HTMLSpanElement[], finalText: string, duration: number, delay: number) {
       const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!?"
       const totalSteps = Math.floor(duration / 25)
       let step = 0
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         const interval = setInterval(() => {
           const progress = step / totalSteps
           chars.forEach((ch, i) => {
+            if (!ch.isConnected) return
             const fc = finalText[i] || ""
             if (fc === " ") { ch.textContent = "\u00A0"; return }
             if (i / finalText.length < progress) { ch.textContent = fc }
@@ -188,6 +190,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
           }
         }, 25)
       }, delay)
+      scrambleTimers.push(timer)
     }
 
     // ── Main Timeline ────────────────────────────────────────────────────────
@@ -683,6 +686,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
       hero.removeEventListener("mousemove", onMouseMove)
       hero.removeEventListener("click", onHeroMobileClick)
       catBody?.removeEventListener("click", onCatClick)
+      scrambleTimers.forEach(clearTimeout)
       tl.kill()
     }
   }, [lang])
