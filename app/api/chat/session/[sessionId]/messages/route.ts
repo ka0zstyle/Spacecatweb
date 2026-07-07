@@ -19,9 +19,10 @@ async function notifyTelegram(
   const name = escapeMarkdown(visitorName?.trim() || "Visitante")
   const preview = escapeMarkdown(content.length > 300 ? content.substring(0, 300) + "…" : content)
 
+  const timestamp = new Date().toLocaleString("es-VE", { timeZone: "America/Caracas", hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })
   const text = [
     `💬 *${name}*: ${preview}`,
-    `_${new Date().toLocaleString("es-VE", { timeZone: "America/Caracas", hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })}_`,
+    `_${escapeMarkdown(timestamp)}_`,
     `Responder: /r\\_${shortId} <mensaje>`,
   ].join("\n")
 
