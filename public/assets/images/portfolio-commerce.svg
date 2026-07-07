@@ -1,0 +1,23 @@
+<svg width="220" height="220" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Composable commerce illustration</title>
+  <desc id="desc">Shopping cart and API cards symbolizing a composable commerce build.</desc>
+  <defs>
+    <linearGradient id="commerceBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#03a4ed" />
+      <stop offset="100%" stop-color="#7dd3ff" />
+    </linearGradient>
+  </defs>
+  <rect width="220" height="220" rx="36" fill="url(#commerceBg)" opacity="0.18" />
+  <rect x="32" y="48" width="156" height="124" rx="22" fill="#ffffff" stroke="#d4edff" stroke-width="2" />
+  <rect x="52" y="68" width="116" height="18" rx="9" fill="#e9f6ff" />
+  <rect x="52" y="96" width="48" height="48" rx="12" fill="#fff3ef" stroke="#ffd6cb" />
+  <path d="M60 108 h32 l-6 24 h-20 z" fill="#fe3f40" />
+  <circle cx="70" cy="150" r="5" fill="#fe3f40" />
+  <circle cx="90" cy="150" r="5" fill="#fe3f40" />
+  <rect x="112" y="96" width="60" height="18" rx="9" fill="#03a4ed" opacity="0.2" />
+  <rect x="112" y="120" width="60" height="18" rx="9" fill="#03a4ed" opacity="0.35" />
+  <rect x="112" y="144" width="60" height="18" rx="9" fill="#03a4ed" />
+  <rect x="78" y="190" width="64" height="10" rx="5" fill="#03a4ed" opacity="0.6" />
+  <circle cx="160" cy="60" r="16" fill="#fe3f40" opacity="0.8" />
+  <path d="M160 50 l6 10 h-12 z" fill="#fff" />
+</svg>

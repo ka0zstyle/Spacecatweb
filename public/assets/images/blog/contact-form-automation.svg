@@ -1,0 +1,67 @@
+<svg width="720" height="480" viewBox="0 0 720 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Contact form automation illustration</title>
+  <desc id="desc">Dashboard widgets showing automated workflows and form submissions.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0C152B" />
+      <stop offset="100%" stop-color="#1D3A5C" />
+    </linearGradient>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2F65A4" />
+      <stop offset="100%" stop-color="#5A8FD3" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7D5CFE" />
+      <stop offset="100%" stop-color="#35C6FF" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#060A14" flood-opacity="0.4" />
+    </filter>
+  </defs>
+  <rect width="720" height="480" fill="url(#bg)" />
+  <g filter="url(#shadow)">
+    <rect x="90" y="80" width="540" height="320" rx="28" fill="#101F37" stroke="#213A5C" stroke-width="2" />
+    <rect x="120" y="118" width="480" height="64" rx="18" fill="#142B4A" />
+    <rect x="150" y="138" width="160" height="12" rx="6" fill="#7D5CFE" />
+    <rect x="150" y="160" width="220" height="10" rx="5" fill="#35C6FF" />
+    <rect x="390" y="132" width="180" height="44" rx="14" fill="#102037" stroke="#2B517E" stroke-width="2" />
+    <rect x="408" y="148" width="146" height="12" rx="6" fill="#2F65A4" />
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="140" y="220" width="240" height="140" rx="22" fill="#0F223D" />
+    <rect x="160" y="244" width="200" height="12" rx="6" fill="#4F8DD8" />
+    <rect x="160" y="268" width="170" height="10" rx="5" fill="#2F65A4" />
+    <rect x="160" y="292" width="130" height="10" rx="5" fill="#35C6FF" />
+    <rect x="160" y="316" width="110" height="10" rx="5" fill="#7D5CFE" />
+    <circle cx="330" cy="314" r="16" fill="#142B4A" />
+    <path d="M323 314 L329 320 L337 306" stroke="#35C6FF" stroke-width="4" fill="none" stroke-linecap="round" />
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="420" y="228" width="180" height="120" rx="20" fill="#142B4A" />
+    <rect x="444" y="252" width="132" height="16" rx="8" fill="#1C3A61" />
+    <rect x="444" y="280" width="132" height="16" rx="8" fill="#1C3A61" />
+    <rect x="444" y="308" width="132" height="16" rx="8" fill="#1C3A61" />
+    <rect x="444" y="252" width="64" height="16" rx="8" fill="#35C6FF" />
+    <rect x="444" y="280" width="82" height="16" rx="8" fill="#7D5CFE" />
+    <rect x="444" y="308" width="48" height="16" rx="8" fill="#2F65A4" />
+  </g>
+  <g opacity="0.85">
+    <path d="M120 400 C240 360 320 360 440 400" fill="none" stroke="#2A5A95" stroke-width="2" stroke-dasharray="10 8" />
+    <path d="M440 400 C520 424 580 416 620 388" fill="none" stroke="#2A5A95" stroke-width="2" stroke-dasharray="10 8" />
+    <circle cx="200" cy="380" r="8" fill="#7D5CFE" />
+    <circle cx="280" cy="368" r="8" fill="#35C6FF" />
+    <circle cx="360" cy="376" r="8" fill="#7D5CFE" />
+    <circle cx="440" cy="398" r="8" fill="#35C6FF" />
+    <circle cx="520" cy="392" r="8" fill="#7D5CFE" />
+  </g>
+  <g>
+    <rect x="520" y="96" width="120" height="64" rx="18" fill="url(#panel)" />
+    <rect x="540" y="116" width="80" height="10" rx="5" fill="#F2F7FF" />
+    <rect x="540" y="134" width="60" height="8" rx="4" fill="#CFE6FF" />
+    <circle cx="612" cy="116" r="6" fill="#F7FBFF" />
+    <circle cx="612" cy="134" r="6" fill="#F7FBFF" />
+  </g>
+  <path d="M540 160 C560 200 520 240 480 248" fill="none" stroke="url(#accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="14 10" />
+  <circle cx="540" cy="160" r="10" fill="#7D5CFE" />
+  <circle cx="480" cy="248" r="10" fill="#35C6FF" />
+</svg>

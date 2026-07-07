@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="commerce-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c1a2f" />
+      <stop offset="100%" stop-color="#155f9d" />
+    </linearGradient>
+    <linearGradient id="commerce-line" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#49d6ff" />
+      <stop offset="100%" stop-color="#2b9fe6" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#commerce-bg)" />
+  <rect x="160" y="160" width="880" height="320" rx="32" ry="32" fill="rgba(10,22,42,0.65)" stroke="rgba(115,206,255,0.4)" stroke-width="4" />
+  <g stroke="url(#commerce-line)" stroke-width="12" stroke-linecap="round">
+    <path d="M220 260 L420 260" />
+    <path d="M220 320 L520 320" />
+    <path d="M220 380 L480 380" />
+    <path d="M560 260 L940 260" opacity="0.7" />
+    <path d="M560 320 L920 320" opacity="0.5" />
+    <path d="M560 380 L880 380" opacity="0.4" />
+  </g>
+  <circle cx="300" cy="260" r="46" fill="#2b9fe6" opacity="0.9" />
+  <circle cx="640" cy="320" r="32" fill="#2b9fe6" opacity="0.7" />
+  <g font-family="'Poppins','Segoe UI',sans-serif" fill="#ffffff">
+    <text x="180" y="120" font-size="60" font-weight="700">Headless Commerce Blueprint 2026</text>
+    <text x="180" y="180" font-size="42" font-weight="300">Scalable Architecture for Global CX</text>
+  </g>
+  <text x="180" y="440" font-family="'Poppins','Segoe UI',sans-serif" font-size="24" fill="#7fe0ff" letter-spacing="3">STRATEGY · PERFORMANCE · UPLIFT</text>
+</svg>

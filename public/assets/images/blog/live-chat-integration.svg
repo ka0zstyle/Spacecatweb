@@ -1,0 +1,60 @@
+<svg width="720" height="480" viewBox="0 0 720 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Live chat integration illustration</title>
+  <desc id="desc">Layered screens and messaging bubbles representing connected customer conversations.</desc>
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#081028" />
+      <stop offset="100%" stop-color="#173354" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#32B5F1" />
+      <stop offset="100%" stop-color="#7D5CFE" />
+    </linearGradient>
+    <linearGradient id="bubbleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0F7FF" />
+      <stop offset="100%" stop-color="#C8E1FF" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#050914" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  <rect width="720" height="480" fill="url(#bgGradient)" />
+  <g filter="url(#shadow)">
+    <rect x="140" y="80" width="440" height="300" rx="24" fill="#0F1F3A" stroke="#224E7A" stroke-width="2" />
+    <rect x="160" y="110" width="400" height="240" rx="18" fill="#13294D" />
+    <rect x="160" y="110" width="400" height="52" rx="18" fill="#0D1A32" />
+    <circle cx="190" cy="136" r="8" fill="#32B5F1" />
+    <circle cx="214" cy="136" r="8" fill="#4AC0FF" />
+    <circle cx="238" cy="136" r="8" fill="#6AD3FF" />
+  </g>
+  <g>
+    <rect x="220" y="190" width="180" height="64" rx="18" fill="url(#bubbleGradient)" />
+    <rect x="240" y="210" width="120" height="12" rx="6" fill="#29598A" />
+    <rect x="240" y="232" width="96" height="10" rx="5" fill="#7D5CFE" />
+    <path d="M220 230 L200 245 L220 220" fill="url(#bubbleGradient)" />
+  </g>
+  <g>
+    <rect x="360" y="260" width="200" height="70" rx="20" fill="#1C3B66" />
+    <rect x="380" y="280" width="140" height="12" rx="6" fill="#A2D8FF" />
+    <rect x="380" y="302" width="110" height="10" rx="5" fill="#32B5F1" />
+    <path d="M560 294 L580 278 L560 314" fill="#1C3B66" />
+  </g>
+  <g opacity="0.9">
+    <rect x="496" y="116" width="120" height="160" rx="18" fill="#0B172A" stroke="#204065" stroke-width="2" />
+    <rect x="512" y="136" width="88" height="28" rx="8" fill="url(#accentGradient)" />
+    <rect x="512" y="178" width="88" height="12" rx="6" fill="#234E80" />
+    <rect x="512" y="200" width="88" height="12" rx="6" fill="#234E80" />
+    <rect x="512" y="222" width="88" height="12" rx="6" fill="#234E80" />
+    <rect x="512" y="244" width="88" height="12" rx="6" fill="#234E80" />
+  </g>
+  <circle cx="140" cy="360" r="52" fill="#1B2F51" opacity="0.7" />
+  <circle cx="600" cy="84" r="42" fill="#1B2F51" opacity="0.6" />
+  <path d="M140 360 C200 330 260 330 320 360" fill="none" stroke="#2E5F94" stroke-width="2" stroke-dasharray="6 8" />
+  <path d="M320 360 C380 390 440 390 500 360" fill="none" stroke="#2E5F94" stroke-width="2" stroke-dasharray="6 8" />
+  <circle cx="200" cy="360" r="6" fill="#7D5CFE" />
+  <circle cx="260" cy="352" r="6" fill="#32B5F1" />
+  <circle cx="320" cy="360" r="6" fill="#7D5CFE" />
+  <circle cx="380" cy="368" r="6" fill="#32B5F1" />
+  <circle cx="440" cy="360" r="6" fill="#7D5CFE" />
+  <circle cx="500" cy="352" r="6" fill="#32B5F1" />
+</svg>
