@@ -1002,7 +1002,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
 
         if (gunRef.current > 0) {
           gunRef.current -= dt
-          const gunBarSpeed = 9000 + gunLevelRef.current * 2000
+          const gunBarSpeed = 5000 + gunLevelRef.current * 2000
           gunBarRef.current += dt / gunBarSpeed
           if (gunBarRef.current >= 1) {
             gunBarRef.current = 0
