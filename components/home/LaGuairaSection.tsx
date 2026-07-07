@@ -56,7 +56,7 @@ export default function LaGuairaSection({ lang }: LaGuairaSectionProps) {
         innerClassName="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         pinSpacing={2000}
         startOffset={80}
-        showProgress={true}
+        showProgress={false}
       >
         {/* Frame 1: Title/Tribute */}
         <div
