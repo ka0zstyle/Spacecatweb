@@ -159,6 +159,7 @@ interface Meteor {
   targetR: number
   life: number
   trail: { x: number; y: number }[]
+  alive: boolean
 }
 
 type PowerUpType = "shield" | "slow" | "double" | "heart" | "gun"
@@ -173,6 +174,7 @@ interface PowerUp {
   life: number
   type: PowerUpType
   trail: { x: number; y: number }[]
+  alive: boolean
 }
 
 interface Particle {
@@ -184,6 +186,7 @@ interface Particle {
   maxLife: number
   r: number
   color: string
+  alive: boolean
 }
 
 interface Bullet {
@@ -192,6 +195,7 @@ interface Bullet {
   vy: number
   r: number
   life: number
+  alive: boolean
 }
 
 interface FloatingText {
@@ -238,6 +242,10 @@ const CAT_BOTTOM_PAD_BASE = 40
 const BASE_GRAVITY = 0.04
 const GRAVITY_INCREMENT = 0.005
 const SPAWN_ANIM_MS = 350
+const MAX_DT = 33 // Cap at ~30fps to prevent huge spikes
+const MAX_TRAIL = 8 // Max trail points per entity
+const MAX_PARTICLES = 150 // Cap total particles
+const MAX_FLOATING_TEXTS = 12 // Cap floating texts
 
 function getWaveCount(score: number): number {
   if (score < 15) return 1
@@ -464,6 +472,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
       targetR,
       life: 0,
       trail: [],
+      alive: true,
     })
   }, [getDifficulty])
 
@@ -487,11 +496,15 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
       life: 0,
       type,
       trail: [],
+      alive: true,
     })
   }, [])
 
   const spawnExplosion = useCallback((x: number, y: number, count: number, color: string) => {
-    for (let i = 0; i < count; i++) {
+    const activeCount = particlesRef.current.filter(p => p.alive).length
+    const canSpawn = Math.min(count, MAX_PARTICLES - activeCount)
+    if (canSpawn <= 0) return
+    for (let i = 0; i < canSpawn; i++) {
       const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5
       const speed = 2 + Math.random() * 4
       particlesRef.current.push({
@@ -502,17 +515,18 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
         maxLife: 30 + Math.random() * 20,
         r: 2 + Math.random() * 3,
         color,
+        alive: true,
       })
     }
   }, [])
 
   const spawnFloatingText = useCallback((x: number, y: number, text: string, color: string, size: number = 20) => {
+    if (floatingTextsRef.current.length >= MAX_FLOATING_TEXTS) return
     floatingTextsRef.current.push({
       x, y, text, color, size,
       life: 0,
       maxLife: 90,
     })
-    if (floatingTextsRef.current.length > 20) floatingTextsRef.current.shift()
   }, [])
 
   const startGame = useCallback(() => {
@@ -711,8 +725,9 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
     let lastTime = performance.now()
 
     const loop = (time: number) => {
-      const dt = time - lastTime
+      const rawDt = time - lastTime
       lastTime = time
+      const dt = Math.min(rawDt, MAX_DT) // Cap delta to prevent huge spikes
       const w = canvas.width
       const h = canvas.height
       let lastCatX = catXRef.current
@@ -727,7 +742,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
           speed: 4 + Math.random() * 3,
           alpha: 0.3 + Math.random() * 0.4,
         })
-        if (streaksRef.current.length > 40) streaksRef.current.shift()
+        if (streaksRef.current.length > 20) streaksRef.current.shift()
       }
 
       const streaks = streaksRef.current
@@ -735,14 +750,11 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
         const s = streaks[i]
         s.y += s.speed
         if (s.y > h + s.length) {
-          streaks.splice(i, 1)
+          streaks[i] = streaks[streaks.length - 1]
+          streaks.pop()
           continue
         }
-        const grad = ctx.createLinearGradient(s.x, s.y, s.x, s.y + s.length)
-        grad.addColorStop(0, `rgba(255, 200, 100, 0)`)
-        grad.addColorStop(0.5, `rgba(255, 200, 100, ${s.alpha})`)
-        grad.addColorStop(1, `rgba(255, 200, 100, 0)`)
-        ctx.strokeStyle = grad
+        ctx.strokeStyle = `rgba(255, 200, 100, ${s.alpha * 0.5})`
         ctx.lineWidth = 1.5
         ctx.beginPath()
         ctx.moveTo(s.x, s.y)
@@ -840,7 +852,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
 
           if (m.life > 100) {
             m.trail.push({ x: m.x, y: m.y })
-            if (m.trail.length > 15) m.trail.shift()
+            if (m.trail.length > MAX_TRAIL) m.trail.shift()
           }
 
           const isFalling = m.vy > 0
@@ -897,7 +909,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
           ctx.globalAlpha = 1
 
           if (m.y > h + m.targetR * 2 || m.x < -m.targetR * 3 || m.x > w + m.targetR * 3) {
-            meteors.splice(i, 1)
+            m.alive = false
             meteorCountRef.current++
             comboRef.current++
             displayComboRef.current = comboRef.current
@@ -916,7 +928,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
             const cy = Math.max(hitY, Math.min(m.y, hitY + hitH))
             const dist = Math.hypot(m.x - cx, m.y - cy)
             if (dist < m.r * 1.5) {
-              meteors.splice(i, 1)
+              m.alive = false
               meteorCountRef.current++
               if (shieldRef.current > 0) {
                 shieldRef.current = 0
@@ -1023,6 +1035,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
                 vy: -(7 + Math.random() * 2),
                 r: 4,
                 life: 0,
+                alive: true,
               })
             }
           }
@@ -1034,7 +1047,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
           b.y += b.vy
           b.life += dt
           if (b.y < -20 || b.life > 2000) {
-            bullets.splice(i, 1)
+            b.alive = false
             continue
           }
           ctx.fillStyle = "#FFD700"
@@ -1051,12 +1064,13 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
 
           for (let j = meteors.length - 1; j >= 0; j--) {
             const m = meteors[j]
+            if (!m.alive) continue
             const dist = Math.hypot(b.x - m.x, b.y - m.y)
             if (dist < m.r * 1.5 + b.r) {
               spawnExplosion(m.x, m.y, 12, "#FFD700")
               spawnExplosion(m.x, m.y, 8, "#F39C12")
-              meteors.splice(j, 1)
-              bullets.splice(i, 1)
+              m.alive = false
+              b.alive = false
               meteorCountRef.current++
               comboRef.current += 5
               displayComboRef.current = comboRef.current
@@ -1158,7 +1172,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
           ctx.fillText(icon, p.x, p.y)
 
           if (p.y > h + p.targetR * 2 || p.x < -p.targetR * 3 || p.x > w + p.targetR * 3) {
-            powerUps.splice(i, 1)
+            p.alive = false
             continue
           }
 
@@ -1206,7 +1220,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
             scoreRef.current += 5
             setDisplayScore(scoreRef.current)
             if (!muteRef.current) playSound(audioCtxRef.current, "combo")
-            powerUps.splice(i, 1)
+            p.alive = false
             continue
           }
         }
@@ -1222,13 +1236,14 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
       const particles = particlesRef.current
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i]
+        if (!p.alive) continue
         p.x += p.vx
         p.y += p.vy
         p.vy += 0.1
         p.life += 1
         const alpha = 1 - p.life / p.maxLife
         if (alpha <= 0) {
-          particles.splice(i, 1)
+          p.alive = false
           continue
         }
         ctx.globalAlpha = alpha
@@ -1370,7 +1385,8 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
         ft.life++
         ft.y -= 0.6
         if (ft.life >= ft.maxLife) {
-          floats.splice(i, 1)
+          floats[i] = floats[floats.length - 1]
+          floats.pop()
           continue
         }
         const progress = ft.life / ft.maxLife
@@ -1385,15 +1401,11 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
         ctx.textAlign = "center"
         ctx.textBaseline = "middle"
         ctx.strokeStyle = "rgba(0,0,0,0.9)"
-        ctx.lineWidth = 5
+        ctx.lineWidth = 4
         ctx.strokeText(ft.text, 0, 0)
         ctx.shadowColor = ft.color
-        ctx.shadowBlur = 20
+        ctx.shadowBlur = 12
         ctx.fillStyle = ft.color
-        ctx.fillText(ft.text, 0, 0)
-        ctx.shadowBlur = 10
-        ctx.fillStyle = "#FFFFFF"
-        ctx.globalAlpha = Math.max(0, alpha * 0.4)
         ctx.fillText(ft.text, 0, 0)
         ctx.shadowBlur = 0
         ctx.globalAlpha = 1
@@ -1401,6 +1413,14 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
       }
 
       if (shake > 0) ctx.restore()
+
+      // Compaction: remove dead entities every 30 frames
+      if (Math.floor(time / 500) % 2 === 0) {
+        meteorsRef.current = meteorsRef.current.filter(m => m.alive)
+        bulletsRef.current = bulletsRef.current.filter(b => b.alive)
+        particlesRef.current = particlesRef.current.filter(p => p.alive)
+        powerUpsRef.current = powerUpsRef.current.filter(p => p.alive)
+      }
 
       rafRef.current = requestAnimationFrame(loop)
     }
