@@ -325,6 +325,28 @@ select,
   }
 }
 
+/* ── Hero Wave Clip-Path Reveal ─────────────────────────────────────────────── */
+.hero-wave-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  pointer-events: none;
+}
+
+.hero-wave-tile {
+  background: #000;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  will-change: clip-path;
+}
+
+.hero-wave-overlay.mobile-mode {
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
 /* ── Hero Reveal — Futurista/Digital Edition ─────────────────────────────── */
 .hero-reveal {
   perspective: 800px;

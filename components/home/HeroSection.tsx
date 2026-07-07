@@ -34,6 +34,8 @@ export default function HeroSection({ lang }: HeroSectionProps) {
   const meowBubbleRef = useRef<HTMLDivElement>(null)
   const eyesImageRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLElement | null>(null)
+  const waveOverlayRef = useRef<HTMLDivElement>(null)
+  const waveTilesRef = useRef<HTMLDivElement[]>([])
 
   useEffect(() => {
     headerRef.current = document.querySelector("header")
@@ -49,6 +51,65 @@ export default function HeroSection({ lang }: HeroSectionProps) {
     const linesFront = linesFrontRef.current
 
     if (!hero || !catBody || !catWrap || !topText || !scrollInd || !linesBack || !linesFront) return
+
+    // ── Wave Clip-Path Reveal Animation ──────────────────────────────────
+    const waveOverlay = waveOverlayRef.current
+    const waveTiles = waveOverlay ? Array.from(waveOverlay.querySelectorAll<HTMLElement>(".hero-wave-tile")) : []
+    const isMobile = window.innerWidth <= 768
+
+    if (waveOverlay && waveTiles.length > 0) {
+      const cols = isMobile ? 5 : 8
+      const rows = isMobile ? 4 : 5
+      const totalTiles = cols * rows
+
+      // Hide extra tiles
+      waveTiles.forEach((tile, i) => {
+        if (i >= totalTiles) {
+          tile.style.display = "none"
+        }
+      })
+
+      if (isMobile) {
+        waveOverlay.classList.add("mobile-mode")
+      }
+
+      // Calculate center of grid
+      const centerCol = (cols - 1) / 2
+      const centerRow = (rows - 1) / 2
+
+      // Sort tiles by distance from center mathematically (CLOSEST first)
+      const tilesWithDist = waveTiles.slice(0, totalTiles).map((tile, i) => {
+        const col = i % cols
+        const row = Math.floor(i / cols)
+        const dist = Math.hypot(col - centerCol, row - centerRow)
+        return { tile, dist }
+      }).sort((a, b) => a.dist - b.dist)
+
+      const maxDist = Math.max(...tilesWithDist.map(t => t.dist)) || 1
+
+      // Animate tiles: center first, edges last = wave from center outward
+      tilesWithDist.forEach(({ tile, dist }) => {
+        const progress = dist / maxDist
+        const delay = 1.0 + progress * 1.2
+        const duration = 0.5
+
+        gsap.to(tile, {
+          clipPath: "polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)",
+          duration,
+          delay,
+          ease: "power2.inOut",
+        })
+      })
+
+      // Hide overlay after all tiles are gone
+      gsap.to(waveOverlay, {
+        opacity: 0,
+        duration: 0.2,
+        delay: 2.8,
+        ease: "none",
+        onComplete: () => { waveOverlay.style.display = "none" },
+      })
+    }
 
     // ── Split Chars (returns flat array + grouped by word) ──────────────────
     function splitChars(container: HTMLDivElement) {
@@ -640,6 +701,17 @@ export default function HeroSection({ lang }: HeroSectionProps) {
     >
       {/* Gradient Overlay (video is now in GlobalVideoBackground) */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/30 z-[1]" />
+
+      {/* Wave Clip-Path Reveal Overlay */}
+      <div ref={waveOverlayRef} className="hero-wave-overlay">
+        {Array.from({ length: 40 }).map((_, i) => (
+          <div
+            key={i}
+            ref={(el) => { if (el) waveTilesRef.current[i] = el }}
+            className="hero-wave-tile"
+          />
+        ))}
+      </div>
 
       {/* Holographic Orbs */}
       <div className="hero-orb hero-orb-1 z-[2]" style={{ background: "rgba(211, 84, 0, 0.15)" }} />
