@@ -1183,7 +1183,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
               gunPointsRef.current += 1
             }
             if (gunPointsRef.current >= 8) {
-              gunRef.current = 8000
+              gunRef.current = 8000 + (gunLevelRef.current - 1) * 2000
               gunPointsRef.current = 0
               gunBarRef.current = 0
               spawnFloatingText(p.x, p.y - 50, "🔫 GUN ACTIVATED!", "#FFD700", 26)
