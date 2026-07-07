@@ -450,7 +450,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
     }
   }, [])
 
-  const spawnMeteor = useCallback((w: number, h: number) => {
+  const spawnMeteor = useCallback((w: number) => {
     if (stateRef.current !== "playing") return
     const { speed } = getDifficulty()
     const mobile = isMobileRef.current
@@ -459,10 +459,10 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
     const targetR = minR + Math.random() * (maxR - minR)
     const margin = maxR
     const spawnX = margin + Math.random() * Math.max(1, w - margin * 2)
-    const spawnY = h * 0.42
+    const spawnY = -targetR
     const vxDir = Math.random() < 0.5 ? -1 : 1
-    const vx = vxDir * (w * 0.001 + Math.random() * w * 0.0015)
-    const vy = -(speed * 2.5 + Math.random() * 1.2)
+    const vx = vxDir * (w * 0.0005 + Math.random() * w * 0.001)
+    const vy = speed * 0.8 + Math.random() * 0.5
     meteorsRef.current.push({
       x: spawnX,
       y: spawnY,
@@ -793,7 +793,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
           const extraMeteors = Math.floor(prevTierRef.current / 4)
           const waveCount = baseWave + extraMeteors
           for (let i = 0; i < waveCount; i++) {
-            setTimeout(() => spawnMeteor(w, h), i * 80)
+            setTimeout(() => spawnMeteor(w), i * 80)
           }
         }
 
@@ -802,7 +802,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
           lastBurstRef.current = 0
           const burstCount = 5 + Math.floor(Math.random() * 4)
           for (let i = 0; i < burstCount; i++) {
-            setTimeout(() => spawnMeteor(w, h), i * 60)
+            setTimeout(() => spawnMeteor(w), i * 60)
           }
           if (!muteRef.current) playSound(audioCtxRef.current, "combo")
         }
@@ -1072,18 +1072,18 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
               m.alive = false
               b.alive = false
               meteorCountRef.current++
-              comboRef.current += 5
+              comboRef.current++
               displayComboRef.current = comboRef.current
               setDisplayCombo(comboRef.current)
               if (comboRef.current > maxComboRef.current) maxComboRef.current = comboRef.current
               const comboBonus = Math.floor(comboRef.current / 5)
               const pointMult = doublePointsRef.current > 0 ? 2 : 1
-              scoreRef.current += (5 + comboBonus) * pointMult
+              scoreRef.current += (2 + comboBonus) * pointMult
               setDisplayScore(scoreRef.current)
-              spawnFloatingText(m.x, m.y - 30, "+5 COMBO!", "#FFD700", 32)
+              spawnFloatingText(m.x, m.y - 30, "+2", "#FFD700", 24)
               if (!muteRef.current) playSound(audioCtxRef.current, "dodge")
               if (gunRef.current > 0) {
-                gunBarRef.current += 0.12
+                gunBarRef.current += 0.04
                 if (gunBarRef.current >= 1) {
                   gunBarRef.current = 0
                   gunLevelRef.current++
