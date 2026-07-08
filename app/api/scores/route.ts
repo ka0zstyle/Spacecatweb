@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server"
 import sql from "@/lib/db"
 
 const MAX_SCORE_PER_SECOND = 50
-const RATE_LIMIT_MS = 5000
-const lastPosts = new Map<string, number>()
 
 export async function GET() {
   try {
@@ -21,14 +19,6 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"
-    const now = Date.now()
-    const last = lastPosts.get(ip) || 0
-    if (now - last < RATE_LIMIT_MS) {
-      return NextResponse.json({ error: "Too fast" }, { status: 429 })
-    }
-    lastPosts.set(ip, now)
-
     const body = await req.json()
     const name = String(body.name || "").replace(/[<>"'&]/g, "").slice(0, 20).trim()
     const score = Math.max(0, Math.floor(Number(body.score) || 0))

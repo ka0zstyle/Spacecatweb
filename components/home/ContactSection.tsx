@@ -47,9 +47,9 @@ export default function ContactSection({ lang }: ContactSectionProps) {
   return (
     <section id="contact" className="relative">
       <ScrollyFrames
-        className="relative min-h-screen flex items-center"
+        className="relative h-screen flex items-center"
         innerClassName="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-        pinSpacing={1400}
+        pinSpacing={800}
         startOffset={80}
         showProgress={false}
       >

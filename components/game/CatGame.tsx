@@ -341,6 +341,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
   const livesRef = useRef(MAX_LIVES)
   const invulnRef = useRef(0)
   const elapsedRef = useRef(0)
+  const wallClockRef = useRef(0)
   const lastSpawnRef = useRef(0)
   const stateRef = useRef<GameState>("idle")
   const shakeRef = useRef(0)
@@ -551,6 +552,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
     livesRef.current = MAX_LIVES
     invulnRef.current = 0
     elapsedRef.current = 0
+    wallClockRef.current = 0
     lastSpawnRef.current = 0
     lastPowerUpRef.current = 0
     lastBurstRef.current = 0
@@ -613,25 +615,45 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
     if (!playerName.trim()) return
     setSaving(true)
     setSaveError(false)
+    const payload = {
+      name: playerName.trim(),
+      score: scoreRef.current,
+      maxCombo: maxComboRef.current,
+      elapsed: wallClockRef.current / 1000,
+    }
     try {
       const res = await fetch("/api/scores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: playerName.trim(),
-          score: scoreRef.current,
-          maxCombo: maxComboRef.current,
-          elapsed: elapsedRef.current / 1000,
-        }),
+        body: JSON.stringify(payload),
       })
       if (!res.ok) throw new Error()
+      localStorage.removeItem("catgame_pending_score")
       await showScoreboard()
     } catch {
+      localStorage.setItem("catgame_pending_score", JSON.stringify(payload))
       setSaveError(true)
     } finally {
       setSaving(false)
     }
   }, [playerName, showScoreboard])
+
+  useEffect(() => {
+    const pending = localStorage.getItem("catgame_pending_score")
+    if (!pending) return
+    try {
+      const payload = JSON.parse(pending)
+      fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }).then((res) => {
+        if (res.ok) localStorage.removeItem("catgame_pending_score")
+      })
+    } catch {
+      localStorage.removeItem("catgame_pending_score")
+    }
+  }, [])
 
   useEffect(() => {
     const parts = [
@@ -774,6 +796,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
 
       if (stateRef.current === "playing") {
         elapsedRef.current += dt
+        wallClockRef.current += rawDt
 
         if (invulnRef.current > 0) invulnRef.current -= dt
 
@@ -1211,7 +1234,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
               gunPointsRef.current += 1
             }
             if (gunPointsRef.current >= 8) {
-              gunRef.current = 8000 + (gunLevelRef.current - 1) * 2000
+              gunRef.current = 8000 + (gunLevelRef.current - 1) * 1000
               gunPointsRef.current = 0
               gunBarRef.current = 0
               spawnFloatingText(p.x, p.y - 50, "🔫 GUN ACTIVATED!", "#FFD700", 26)

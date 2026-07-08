@@ -6,6 +6,8 @@ import type { Lang } from "@/lib/lang"
 import CatGame from "@/components/game/CatGame"
 import { useGame } from "@/app/providers"
 
+const SCRAMBLE_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!?"
+
 interface HeroSectionProps {
   lang: Lang
 }
@@ -169,8 +171,8 @@ export default function HeroSection({ lang }: HeroSectionProps) {
 
     // ── Text Scramble (works on individual spans, not parent) ──────────────
     const scrambleTimers: ReturnType<typeof setTimeout>[] = []
+    const heroIntervals: ReturnType<typeof setInterval>[] = []
     function scrambleGroup(chars: HTMLSpanElement[], finalText: string, duration: number, delay: number) {
-      const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!?"
       const totalSteps = Math.floor(duration / 25)
       let step = 0
       const timer = setTimeout(() => {
@@ -181,7 +183,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
             const fc = finalText[i] || ""
             if (fc === " ") { ch.textContent = "\u00A0"; return }
             if (i / finalText.length < progress) { ch.textContent = fc }
-            else { ch.textContent = charset[Math.floor(Math.random() * charset.length)] }
+            else { ch.textContent = SCRAMBLE_CHARSET[Math.floor(Math.random() * SCRAMBLE_CHARSET.length)] }
           })
           step++
           if (step > totalSteps) {
@@ -472,7 +474,8 @@ export default function HeroSection({ lang }: HeroSectionProps) {
         catInFront = !catInFront
       }
 
-      setInterval(interactionLoop, 3000)
+      const interactionInterval = setInterval(interactionLoop, 3000)
+      heroIntervals.push(interactionInterval)
     }, undefined, 10.0)
 
     hero.classList.add("active")
@@ -687,6 +690,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
       hero.removeEventListener("click", onHeroMobileClick)
       catBody?.removeEventListener("click", onCatClick)
       scrambleTimers.forEach(clearTimeout)
+      heroIntervals.forEach(clearInterval)
       tl.kill()
     }
   }, [lang])
