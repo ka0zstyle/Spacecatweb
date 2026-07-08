@@ -5,8 +5,9 @@ export function middleware(request: NextRequest) {
   const proto = request.headers.get("x-forwarded-proto")
   const isHttp = proto === "http" || (!proto && request.nextUrl.protocol === "http:")
   if (isHttp) {
-    const url = new URL(request.url)
+    const url = request.nextUrl
     url.protocol = "https:"
+    url.port = ""
     return NextResponse.redirect(url, 301)
   }
   return NextResponse.next()

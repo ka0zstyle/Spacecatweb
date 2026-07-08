@@ -41,7 +41,7 @@ export const projects: PortfolioProject[] = [
         "SEO optimized for Chile",
       ],
     },
-    images: ["/assets/proyects/meeple1.png", "/assets/proyects/meeple2.png"],
+    images: ["/assets/proyects/meeple1.webp", "/assets/proyects/meeple2.webp"],
   },
   {
     slug: "nanosoluciones",
@@ -74,7 +74,7 @@ export const projects: PortfolioProject[] = [
         "Professional responsive design",
       ],
     },
-    images: ["/assets/proyects/nano1.png", "/assets/proyects/nano2.png"],
+    images: ["/assets/proyects/nano1.webp", "/assets/proyects/nano2.webp"],
   },
   {
     slug: "galpoven",
@@ -107,7 +107,7 @@ export const projects: PortfolioProject[] = [
         "Local SEO optimized for Chile",
       ],
     },
-    images: ["/assets/proyects/Galpoven1.png", "/assets/proyects/galpoven2.png", "/assets/proyects/galpoven3.png"],
+    images: ["/assets/proyects/Galpoven1.webp", "/assets/proyects/galpoven2.webp", "/assets/proyects/galpoven3.webp"],
   },
 ]
 
