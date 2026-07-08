@@ -85,8 +85,8 @@ export default async function BlogPage({
             href={`/blog/${featured.slug}?lang=${locale}`}
             className="group block rounded-2xl bg-sc-card/40 backdrop-blur-md border border-white/10 overflow-hidden hover:border-sc-primary/30 transition-all hover:-translate-y-1 mb-12"
           >
-            <div className="aspect-[21/9] bg-gradient-to-br from-sc-primary/20 to-sc-accent/10 flex items-center justify-center">
-              <span className="text-6xl font-black text-white/10">{featured.category[0]}</span>
+            <div className="aspect-video sm:aspect-[21/9] bg-gradient-to-br from-sc-primary/20 to-sc-accent/10 flex items-center justify-center">
+              <span className="text-4xl sm:text-6xl font-black text-white/10">{featured.category[0]}</span>
             </div>
             <div className="p-8">
               <div className="flex flex-wrap items-center gap-4 mb-4 text-xs text-sc-muted">

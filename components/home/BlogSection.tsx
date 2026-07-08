@@ -110,8 +110,8 @@ function BlogSectionInner({ lang }: BlogSectionProps) {
                 onClick={() => setOpenPost(0)}
                 className="group text-left w-full max-w-4xl rounded-2xl bg-sc-card/40 backdrop-blur-md border border-white/10 overflow-hidden hover:border-sc-primary/30 transition-all hover:-translate-y-1 cursor-pointer"
               >
-                <div className="aspect-[21/9] bg-gradient-to-br from-sc-primary/20 to-sc-accent/10 flex items-center justify-center">
-                  <span className="text-6xl font-black text-white/10">{featuredPost.category[0]}</span>
+                <div className="aspect-video sm:aspect-[21/9] bg-gradient-to-br from-sc-primary/20 to-sc-accent/10 flex items-center justify-center">
+                  <span className="text-4xl sm:text-6xl font-black text-white/10">{featuredPost.category[0]}</span>
                 </div>
                 <div className="p-8">
                   <div className="flex items-center gap-4 mb-4 text-xs text-sc-muted">
