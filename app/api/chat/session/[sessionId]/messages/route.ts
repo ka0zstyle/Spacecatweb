@@ -13,29 +13,52 @@ async function notifyTelegram(
   visitorName: string | null,
   content: string
 ) {
-  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    console.warn("[Telegram notify] Token o Chat ID no configurados")
+    return
+  }
 
-  const shortId = sessionId.slice(0, 8)
-  const name = escapeMarkdown(visitorName?.trim() || "Visitante")
-  const preview = escapeMarkdown(content.length > 300 ? content.substring(0, 300) + "…" : content)
+  try {
+    const shortId = sessionId.slice(0, 8)
+    const name = escapeMarkdown(visitorName?.trim() || "Visitante")
+    const preview = escapeMarkdown(content.length > 300 ? content.substring(0, 300) + "…" : content)
 
-  const timestamp = new Date().toLocaleString("es-VE", { timeZone: "America/Caracas", hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" })
-  const text = [
-    `💬 *${name}*: ${preview}`,
-    `_${escapeMarkdown(timestamp)}_`,
-    `Responder: /r\\_${shortId} <mensaje>`,
-  ].join("\n")
+    const timestamp = new Date().toLocaleString("es-VE", {
+      timeZone: "America/Caracas",
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+    })
 
-  await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: TELEGRAM_CHAT_ID,
-      text,
-      parse_mode: "MarkdownV2",
-      disable_web_page_preview: true,
-    }),
-  }).catch(() => {})
+    const text = [
+      `💬 *${name}*: ${preview}`,
+      `_${escapeMarkdown(timestamp)}_`,
+    ].join("\n")
+
+    const res = await fetch(
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text,
+          parse_mode: "MarkdownV2",
+          disable_web_page_preview: true,
+        }),
+      }
+    )
+
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => "")
+      console.error("[Telegram notify] Error:", res.status, errBody)
+    } else {
+      console.log("[Telegram notify] Notificación enviada correctamente")
+    }
+  } catch (err) {
+    console.error("[Telegram notify] Excepción al notificar:", err)
+  }
 }
 
 export async function GET(
@@ -131,7 +154,7 @@ export async function POST(
 
     const msg = created[0]
 
-    notifyTelegram(sessionId, session[0].visitor_name, content)
+    await notifyTelegram(sessionId, session[0].visitor_name, content)
 
     return NextResponse.json({
       id: msg.id,

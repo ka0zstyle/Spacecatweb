@@ -23,6 +23,25 @@ function escapeMarkdown(text: string): string {
   return text.replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, "\\$&")
 }
 
+async function lookupCountry(ip: string | null): Promise<string | null> {
+  if (!ip) return null
+  if (ip === "127.0.0.1" || ip === "::1" || ip.startsWith("192.168.") || ip.startsWith("10.") || ip.startsWith("172.")) {
+    return "🌐 LAN"
+  }
+  try {
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=country,countryCode&lang=es`, {
+      signal: AbortSignal.timeout(3000),
+    })
+    if (res.ok) {
+      const data = await res.json() as { country?: string; countryCode?: string }
+      if (data.country) return `${data.country} ${data.countryCode ? `(${data.countryCode})` : ""}`
+    }
+  } catch {
+    /* ignore */
+  }
+  return null
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -69,6 +88,55 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true })
     }
 
+    // ── /data o /data_ABC — datos del visitante ─────────────────────────────
+    const dataMatch = text.match(/^\/data(?:_([a-zA-Z0-9]+))?$/i)
+    if (dataMatch) {
+      const targetShortId = dataMatch[1] ?? null
+      const rows = targetShortId
+        ? await sql`
+            SELECT id, visitor_name, visitor_email, visitor_whatsapp, visitor_ip, status, created_at, updated_at
+            FROM chat_sessions WHERE id::text LIKE ${targetShortId + '%'}
+            ORDER BY updated_at DESC LIMIT 1
+          `
+        : await sql`
+            SELECT id, visitor_name, visitor_email, visitor_whatsapp, visitor_ip, status, created_at, updated_at
+            FROM chat_sessions WHERE status = 'OPEN'
+            ORDER BY updated_at DESC LIMIT 1
+          `
+      const session = rows[0] ?? null
+      if (!session) {
+        const msg = targetShortId
+          ? `❌ No se encontró ningún chat con ID \`${escapeMarkdown(targetShortId)}\`\\.`
+          : "❌ No hay chats abiertos en este momento\\."
+        await sendTelegramMessage(fromChatId, msg)
+        return NextResponse.json({ ok: true })
+      }
+      const shortId = String(session.id).slice(0, 8)
+      const name = session.visitor_name ? escapeMarkdown(String(session.visitor_name)) : "Anónimo"
+      const email = session.visitor_email ? escapeMarkdown(String(session.visitor_email)) : "—"
+      const whatsapp = session.visitor_whatsapp ? escapeMarkdown(String(session.visitor_whatsapp)) : "—"
+      const country = await lookupCountry(session.visitor_ip ?? null)
+      const created = new Date(session.created_at).toLocaleString("es-VE", {
+        timeZone: "America/Caracas", day: "2-digit", month: "2-digit", year: "numeric",
+        hour: "2-digit", minute: "2-digit",
+      })
+      const updated = new Date(session.updated_at).toLocaleString("es-VE", {
+        timeZone: "America/Caracas", day: "2-digit", month: "2-digit", year: "numeric",
+        hour: "2-digit", minute: "2-digit",
+      })
+      const statusIcon = session.status === "OPEN" ? "🟢" : "🔴"
+      await sendTelegramMessage(
+        fromChatId,
+        `*${name}* \\- \`${shortId}\` ${statusIcon}\n\n` +
+          `📧 ${email}\n` +
+          `📱 ${whatsapp}\n` +
+          `${country ? `🌍 ${escapeMarkdown(country)}\n` : ""}` +
+          `🕐 Iniciado: ${escapeMarkdown(created)}\n` +
+          `🕐 Última actividad: ${escapeMarkdown(updated)}`
+      )
+      return NextResponse.json({ ok: true })
+    }
+
     // ── /r o /r_ABC o mensaje directo ───────────────────────────────────────
     const replyMatch = text.match(/^\/r(?:_([a-zA-Z0-9]+))?\s+([\s\S]+)$/i)
     let shortId: string | null = null
@@ -87,6 +155,8 @@ export async function POST(request: NextRequest) {
           "Escribe directo para responder al último chat\n" +
           "`/r <mensaje>` — responde al último chat abierto\n" +
           "`/r\\_ABC <mensaje>` — responde a un chat específico\n" +
+          "`/data` — datos del último chat abierto\n" +
+          "`/data\\_ABC` — datos de un chat específico\n" +
           "`/chats` — lista los chats abiertos"
       )
       return NextResponse.json({ ok: true })
