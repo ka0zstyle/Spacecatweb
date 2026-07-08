@@ -950,8 +950,8 @@ export default function HeroSection({ lang }: HeroSectionProps) {
             ref={eyesImageRef}
             className="absolute pointer-events-none"
             style={{
-              top: "22.5%",
-              left: "63%",
+              top: "23.0%",
+              left: "63.5%",
               width: "42.0%",
               transform: "translate(-50%, 0px)",
               zIndex: 2,
