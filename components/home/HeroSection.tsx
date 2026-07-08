@@ -143,7 +143,37 @@ export default function HeroSection({ lang }: HeroSectionProps) {
     // ── Kill CSS transitions that fight GSAP ────────────────────────────────
     gsap.set([...backChars, ...frontChars], { transition: "none" })
 
+    let eyeIdleActive = true
     let eyeIdleTimer: ReturnType<typeof setTimeout>
+    function startEyeIdle() {
+      if (!eyesImageRef.current) return
+      eyeIdleActive = true
+      const lookAround = () => {
+        if (!eyeIdleActive || !eyesImageRef.current) return
+        const tx = (Math.random() - 0.5) * 10
+        const ty = (Math.random() - 0.5) * 4
+        gsap.to(eyesImageRef.current, {
+          x: tx,
+          y: ty,
+          duration: 0.4,
+          ease: "power2.out",
+          onComplete: () => {
+            if (!eyesImageRef.current) return
+            gsap.to(eyesImageRef.current, {
+              x: 0,
+              y: 0,
+              duration: 0.3,
+              ease: "power2.inOut",
+              onComplete: () => {
+                const delay = 2000 + Math.random() * 3000
+                setTimeout(lookAround, delay)
+              },
+            })
+          },
+        })
+      }
+      setTimeout(lookAround, 1000)
+    }
 
     // ── Force layout reflow before measuring positions ──────────────────────
     void hero.offsetHeight
@@ -384,6 +414,8 @@ export default function HeroSection({ lang }: HeroSectionProps) {
         repeat: -1,
       })
 
+      startEyeIdle()
+
       gsap.to(backChars, {
         rotationY: 8,
         duration: 4,
@@ -501,18 +533,29 @@ export default function HeroSection({ lang }: HeroSectionProps) {
 
       // Desktop: eyes follow cursor
       if (window.innerWidth > 768 && eyesImageRef.current) {
-        eyesImageRef.current.classList.remove("cat-eyes-idle")
-        eyesImageRef.current.style.transition = "none"
-        const followX = normX * 3
-        const followY = normY * 1
-        eyesImageRef.current.style.transform = `translate(calc(-50% + ${followX}px), ${followY}px)`
+        eyeIdleActive = false
+        gsap.killTweensOf(eyesImageRef.current)
+        const followX = normX * 4
+        const followY = normY * 2
+        gsap.to(eyesImageRef.current, {
+          x: followX,
+          y: followY,
+          duration: 0.15,
+          ease: "power2.out",
+          overwrite: true,
+        })
         clearTimeout(eyeIdleTimer)
         eyeIdleTimer = setTimeout(() => {
           if (eyesImageRef.current) {
-            eyesImageRef.current.style.transform = "translate(-50%, 0px)"
-            eyesImageRef.current.classList.add("cat-eyes-idle")
+            gsap.to(eyesImageRef.current, {
+              x: 0,
+              y: 0,
+              duration: 0.3,
+              ease: "power2.inOut",
+              onComplete: () => startEyeIdle(),
+            })
           }
-        }, 2000)
+        }, 1500)
       }
 
       // Repel behavior (only when close)
@@ -566,29 +609,29 @@ export default function HeroSection({ lang }: HeroSectionProps) {
         overwrite: "auto",
       })
 
-      // Vigorous limb shake on click
-      const shakeLimbs = (el: HTMLElement | null, rot: number, dur: number) => {
+      // Slow, prolonged limb wave on click
+      const shakeLimbs = (el: HTMLElement | null, rot: number, dur: number, reps: number) => {
         if (!el) return
         gsap.to(el, {
           rotation: `+=${rot}`,
           duration: dur,
-          ease: "power2.out",
+          ease: "sine.inOut",
           yoyo: true,
-          repeat: 3,
+          repeat: reps,
           overwrite: "auto",
         })
       }
-      shakeLimbs(catArmLRef.current, 25, 0.1)
-      shakeLimbs(catArmRRef.current, -25, 0.12)
-      shakeLimbs(catLegLRef.current, 20, 0.11)
-      shakeLimbs(catLegRRef.current, -20, 0.09)
+      shakeLimbs(catArmLRef.current, 18, 0.35, 5)
+      shakeLimbs(catArmRRef.current, -18, 0.4, 5)
+      shakeLimbs(catLegLRef.current, 14, 0.38, 5)
+      shakeLimbs(catLegRRef.current, -14, 0.32, 5)
       if (catTailRef.current) {
         gsap.to(catTailRef.current, {
-          rotation: 40,
-          duration: 0.15,
-          ease: "power2.out",
+          rotation: 30,
+          duration: 0.3,
+          ease: "sine.inOut",
           yoyo: true,
-          repeat: 5,
+          repeat: 7,
           overwrite: "auto",
         })
       }
@@ -729,6 +772,8 @@ export default function HeroSection({ lang }: HeroSectionProps) {
       scrambleTimers.forEach(clearTimeout)
       heroIntervals.forEach(clearInterval)
       clearTimeout(eyeIdleTimer)
+      eyeIdleActive = false
+      if (eyesImageRef.current) gsap.killTweensOf(eyesImageRef.current)
       tl.kill()
     }
   }, [lang])
@@ -889,7 +934,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
           {/* Eyes overlay - on cat face */}
           <div
             ref={eyesImageRef}
-            className="absolute pointer-events-none cat-eyes-idle"
+            className="absolute pointer-events-none"
             style={{
               top: "22.5%",
               left: "63%",
