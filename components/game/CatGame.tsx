@@ -1015,7 +1015,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
 
         if (gunRef.current > 0) {
           gunRef.current -= dt
-          const gunBarSpeed = 5000 + gunLevelRef.current * 2000
+          const gunBarSpeed = 5000 * Math.pow(1.2, gunLevelRef.current - 1)
           gunBarRef.current += dt / gunBarSpeed
           if (gunBarRef.current >= 1) {
             gunBarRef.current = 0
@@ -1085,7 +1085,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
               spawnFloatingText(m.x, m.y - 30, "+2", "#FFD700", 24)
               if (!muteRef.current) playSound(audioCtxRef.current, "dodge")
               if (gunRef.current > 0) {
-                gunBarRef.current += 0.04
+                gunBarRef.current += 0.04 / Math.pow(1.2, gunLevelRef.current - 1)
                 if (gunBarRef.current >= 1) {
                   gunBarRef.current = 0
                   gunLevelRef.current++
@@ -1327,7 +1327,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
 
         const gunBarTotalW = 180
         const gunBarX = (w - gunBarTotalW) / 2
-        const gunBarY = h - 40
+        const gunBarY = isMobileRef.current ? h * 0.9 : h - 40
         const gunBarH = 10
         const pointW = (gunBarTotalW - 16) / 8
         const pointGap = 2
