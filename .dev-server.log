@@ -1,0 +1,40 @@
+
+> spacecatweb@0.1.0 dev
+> next dev -H 0.0.0.0
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://0.0.0.0:3000
+- Environments: .env.local
+✓ Ready in 1542ms
+
+ GET / 200 in 3.5s (next.js: 803ms, application-code: 2.7s)
+ GET /api/chat/session/ae114511-ef67-4970-9ef4-6a0688a7dae5/stream?visitorId=c10bbd6c-dc74-4616-bbf8-0d715a7554f0 404 in 3.9s (next.js: 3.5s, application-code: 320ms)
+ GET / 200 in 640ms (next.js: 25ms, application-code: 615ms)
+ GET /api/chat/session/ae114511-ef67-4970-9ef4-6a0688a7dae5/messages?visitorId=c10bbd6c-dc74-4616-bbf8-0d715a7554f0 404 in 407ms (next.js: 44ms, application-code: 363ms)
+ POST /api/chat/session/9cb0873b-7b8c-430f-87ad-b82ed5782da2/messages 404 in 165ms (next.js: 21ms, application-code: 145ms)
+ GET / 200 in 288ms (next.js: 7ms, application-code: 280ms)
+ GET / 200 in 375ms (next.js: 15ms, application-code: 360ms)
+ GET /api/chat/session/ae114511-ef67-4970-9ef4-6a0688a7dae5/messages?visitorId=c10bbd6c-dc74-4616-bbf8-0d715a7554f0 404 in 246ms (next.js: 25ms, application-code: 222ms)
+ GET /api/chat/config 200 in 209ms (next.js: 178ms, application-code: 31ms)
+ POST /api/chat/session 200 in 866ms (next.js: 168ms, application-code: 698ms)
+ GET /api/telegram 200 in 2.1s (next.js: 1380ms, application-code: 679ms)
+ POST /api/chat/session 200 in 1253ms (next.js: 15ms, application-code: 1238ms)
+ GET /api/chat/session/8cc6be69-c700-4063-bddc-748a4ad0c522/stream?visitorId=84c7e0c0-303d-43bc-b7ea-835eb5ce9cb3 404 in 134ms (next.js: 32ms, application-code: 103ms)
+ GET /api/chat/session/8cc6be69-c700-4063-bddc-748a4ad0c522/messages?visitorId=84c7e0c0-303d-43bc-b7ea-835eb5ce9cb3 404 in 301ms (next.js: 24ms, application-code: 277ms)
+ POST /api/chat/session/8cc6be69-c700-4063-bddc-748a4ad0c522/messages 404 in 131ms (next.js: 19ms, application-code: 113ms)
+ GET /api/chat/session/ae114511-ef67-4970-9ef4-6a0688a7dae5/messages?visitorId=c10bbd6c-dc74-4616-bbf8-0d715a7554f0 404 in 121ms (next.js: 13ms, application-code: 108ms)
+ POST /api/chat/session/8cc6be69-c700-4063-bddc-748a4ad0c522/messages 404 in 179ms (next.js: 17ms, application-code: 162ms)
+ POST /api/chat/session/8cc6be69-c700-4063-bddc-748a4ad0c522/messages 404 in 187ms (next.js: 17ms, application-code: 170ms)
+ POST /api/chat/session/8cc6be69-c700-4063-bddc-748a4ad0c522/messages 404 in 122ms (next.js: 25ms, application-code: 98ms)
+ GET /api/chat/session/ae114511-ef67-4970-9ef4-6a0688a7dae5/messages?visitorId=c10bbd6c-dc74-4616-bbf8-0d715a7554f0 404 in 171ms (next.js: 19ms, application-code: 151ms)
+ POST /api/chat/session/8cc6be69-c700-4063-bddc-748a4ad0c522/messages 404 in 114ms (next.js: 20ms, application-code: 94ms)
+ GET /api/chat/session/ae114511-ef67-4970-9ef4-6a0688a7dae5/messages?visitorId=c10bbd6c-dc74-4616-bbf8-0d715a7554f0 404 in 113ms (next.js: 14ms, application-code: 99ms)
+ GET /api/chat/session/9cb0873b-7b8c-430f-87ad-b82ed5782da2/messages?visitorId=test-abc 404 in 143ms (next.js: 25ms, application-code: 118ms)
+ GET /api/chat/session/9cb0873b-7b8c-430f-87ad-b82ed5782da2/stream?visitorId=test-abc 404 in 122ms (next.js: 16ms, application-code: 107ms)
+ PATCH /api/chat/session/9cb0873b-7b8c-430f-87ad-b82ed5782da2 400 in 2.5s (next.js: 2.5s, application-code: 27ms)
+ GET /api/chat/session/ae114511-ef67-4970-9ef4-6a0688a7dae5/messages?visitorId=c10bbd6c-dc74-4616-bbf8-0d715a7554f0 404 in 149ms (next.js: 18ms, application-code: 131ms)
+ GET /api/chat/session/ae114511-ef67-4970-9ef4-6a0688a7dae5/messages?visitorId=c10bbd6c-dc74-4616-bbf8-0d715a7554f0 404 in 146ms (next.js: 24ms, application-code: 122ms)
+ GET /api/chat/session/ae114511-ef67-4970-9ef4-6a0688a7dae5/messages?visitorId=c10bbd6c-dc74-4616-bbf8-0d715a7554f0 404 in 152ms (next.js: 18ms, application-code: 135ms)
+ GET /api/chat/session/ae114511-ef67-4970-9ef4-6a0688a7dae5/messages?visitorId=c10bbd6c-dc74-4616-bbf8-0d715a7554f0 404 in 202ms (next.js: 23ms, application-code: 179ms)
+[?25h

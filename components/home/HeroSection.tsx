@@ -159,13 +159,13 @@ export default function HeroSection({ lang }: HeroSectionProps) {
           ease: "power2.out",
           onComplete: () => {
             if (!eyesImageRef.current) return
-            gsap.to(eyesImageRef.current, {
-              x: 0,
-              y: 0,
-              duration: 0.3,
-              ease: "power2.inOut",
-              onComplete: () => {
-                const delay = 2000 + Math.random() * 3000
+        gsap.to(eyesImageRef.current, {
+          x: 0,
+          y: 0,
+          duration: 0.45,
+          ease: "power2.inOut",
+          onComplete: () => {
+            const delay = 2000 + Math.random() * 3000
                 setTimeout(lookAround, delay)
               },
             })
@@ -377,13 +377,14 @@ export default function HeroSection({ lang }: HeroSectionProps) {
     )
 
     // Phase 6: Limb animations + back text orbit
-    tl.call(() => {
+    function startIdleLimbs() {
       gsap.to(catArmLRef.current, {
         rotation: 12,
         duration: 2.8,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
+        overwrite: false,
       })
       gsap.to(catArmRRef.current, {
         rotation: -10,
@@ -391,6 +392,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
+        overwrite: false,
       })
       gsap.to(catLegLRef.current, {
         rotation: 10,
@@ -398,6 +400,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
+        overwrite: false,
       })
       gsap.to(catLegRRef.current, {
         rotation: -8,
@@ -405,6 +408,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
+        overwrite: false,
       })
       gsap.to(catTailRef.current, {
         rotation: 20,
@@ -412,8 +416,11 @@ export default function HeroSection({ lang }: HeroSectionProps) {
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
+        overwrite: false,
       })
-
+    }
+    tl.call(() => {
+      startIdleLimbs()
       startEyeIdle()
 
       gsap.to(backChars, {
@@ -610,6 +617,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
       })
 
       // Slow, prolonged limb wave on click
+      const clickDuration = 4.5
       const shakeLimbs = (el: HTMLElement | null, rot: number, dur: number, reps: number) => {
         if (!el) return
         gsap.to(el, {
@@ -621,20 +629,26 @@ export default function HeroSection({ lang }: HeroSectionProps) {
           overwrite: "auto",
         })
       }
-      shakeLimbs(catArmLRef.current, 18, 0.35, 5)
-      shakeLimbs(catArmRRef.current, -18, 0.4, 5)
-      shakeLimbs(catLegLRef.current, 14, 0.38, 5)
-      shakeLimbs(catLegRRef.current, -14, 0.32, 5)
+      shakeLimbs(catArmLRef.current, 15, 0.4, 5)
+      shakeLimbs(catArmRRef.current, -15, 0.45, 5)
+      shakeLimbs(catLegLRef.current, 8, 0.42, 5)
+      shakeLimbs(catLegRRef.current, -12, 0.38, 5)
       if (catTailRef.current) {
         gsap.to(catTailRef.current, {
-          rotation: 30,
-          duration: 0.3,
+          rotation: 25,
+          duration: 0.35,
           ease: "sine.inOut",
           yoyo: true,
           repeat: 7,
           overwrite: "auto",
         })
       }
+
+      // Restart idle animations after click wave ends
+      gsap.delayedCall(clickDuration, () => {
+        startIdleLimbs()
+        startEyeIdle()
+      })
 
       // Energy aura - intense glow
       if (energyAuraRef.current) {
