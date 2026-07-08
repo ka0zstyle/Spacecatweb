@@ -843,6 +843,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
         const { gravity } = getDifficulty()
         for (let i = meteors.length - 1; i >= 0; i--) {
           const m = meteors[i]
+          if (!m.alive) continue
           const slowFactor = slowMoRef.current > 0 ? 0.4 : 1
           m.vy += gravity * slowFactor
           m.vx *= 0.993
@@ -1044,6 +1045,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
         const bullets = bulletsRef.current
         for (let i = bullets.length - 1; i >= 0; i--) {
           const b = bullets[i]
+          if (!b.alive) continue
           b.y += b.vy
           b.life += dt
           if (b.y < -20 || b.life > 2000) {
@@ -1128,6 +1130,7 @@ export default function CatGame({ lang, onClose, onStart }: CatGameProps) {
         const powerUps = powerUpsRef.current
         for (let i = powerUps.length - 1; i >= 0; i--) {
           const p = powerUps[i]
+          if (!p.alive) continue
           p.vy += gravity * 0.5
           p.x += p.vx
           p.y += p.vy
