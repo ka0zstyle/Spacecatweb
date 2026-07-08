@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { Heart, X, ChevronLeft, ChevronRight, Flame } from "lucide-react"
-import ScrollyFrames from "@/components/ui/scrolly-frames"
 import type { Lang } from "@/lib/lang"
 
 interface LaGuairaSectionProps {
@@ -51,13 +50,7 @@ export default function LaGuairaSection({ lang }: LaGuairaSectionProps) {
 
   return (
     <section id="laguaira" className="relative">
-      <ScrollyFrames
-        className="relative min-h-screen flex items-center"
-        innerClassName="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-        pinSpacing={1200}
-        startOffset={80}
-        showProgress={false}
-      >
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Frame 1: Title/Tribute */}
         <div
           ref={heroRef}
@@ -97,7 +90,7 @@ export default function LaGuairaSection({ lang }: LaGuairaSectionProps) {
         </div>
 
         {/* Frame 2: Gallery */}
-        <div ref={galleryRef} className="flex flex-col items-center justify-center w-full">
+        <div ref={galleryRef} className="flex flex-col items-center justify-center w-full mt-16">
           <span className="inline-block px-3 py-1 mb-3 rounded-full text-xs font-mono tracking-[0.3em] uppercase text-sc-primary border border-sc-primary/30 bg-sc-primary/5">
             {lang.laguaira_gallery}
           </span>
@@ -142,7 +135,7 @@ export default function LaGuairaSection({ lang }: LaGuairaSectionProps) {
         </div>
 
         {/* Frame 3: Pray + Fact + Condolence (merged) */}
-        <div ref={prayRef} className="flex flex-col items-center justify-center w-full">
+        <div ref={prayRef} className="flex flex-col items-center justify-center w-full mt-16">
           <div className="relative max-w-5xl w-full p-5 sm:p-6 rounded-3xl bg-sc-card/30 backdrop-blur-md border border-white/10">
             <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-sc-primary/20 via-transparent to-sc-accent/10 pointer-events-none" />
             <div className="relative z-10 flex flex-col sm:flex-row items-center gap-5">
@@ -193,7 +186,7 @@ export default function LaGuairaSection({ lang }: LaGuairaSectionProps) {
             </div>
           </div>
         </div>
-      </ScrollyFrames>
+      </div>
 
       {/* Lightbox */}
       {lightbox !== null && (
