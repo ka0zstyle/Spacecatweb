@@ -5,16 +5,12 @@ const POLL_MS = 2500
 const HEARTBEAT_MS = 15000
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) return Promise.reject(new Error("aborted"))
   return new Promise((resolve, reject) => {
-    const t = setTimeout(resolve, ms)
-    signal.addEventListener(
-      "abort",
-      () => {
-        clearTimeout(t)
-        reject(new Error("aborted"))
-      },
-      { once: true }
-    )
+    const t = setTimeout(() => {
+      if (signal.aborted) reject(new Error("aborted"))
+      else resolve()
+    }, ms)
   })
 }
 
