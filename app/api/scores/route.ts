@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import sql from "@/lib/db"
 
-const MAX_SCORE_PER_SECOND = 5
+const MAX_SCORE_PER_SECOND = 50
 const RATE_LIMIT_MS = 5000
 const lastPosts = new Map<string, number>()
 
