@@ -391,11 +391,11 @@ export default function ChatBubble() {
   return (
     <div className="fixed bottom-6 left-6 z-50 flex flex-col items-start gap-2">
       {open && (
-        <div
-          className={cn(
-            "flex flex-col rounded-2xl shadow-xl overflow-hidden",
-            "w-[min(100vw-2rem,380px)] h-[480px]"
-          )}
+          <div
+            className={cn(
+              "flex flex-col rounded-2xl shadow-xl overflow-hidden",
+              "w-[min(100vw-2rem,380px)] h-[480px]"
+            )}
           style={{
             background: "linear-gradient(160deg, #0a0a18 0%, #0f0e1a 60%, #100d05 100%)",
             border: "1px solid rgba(211,84,0,0.25)",
@@ -557,7 +557,7 @@ export default function ChatBubble() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder={lang.chat_message_placeholder}
-                      className="flex-1 px-3 py-2 text-sm rounded-xl bg-white/5 border border-white/10 text-white placeholder-sc-muted focus:outline-none focus:border-sc-primary transition-colors"
+                      className="flex-1 min-w-0 px-3 py-2 text-sm rounded-xl bg-white/5 border border-white/10 text-white placeholder-sc-muted focus:outline-none focus:border-sc-primary transition-colors"
                       disabled={loading || sending}
                     />
                     <button
