@@ -1035,6 +1035,17 @@ select,
   animation: sparkle-line-streak 3s ease-in-out infinite;
 }
 
+@keyframes cat-eyes-idle {
+  0%, 100% { transform: translate(calc(-50% - 4px), 0px); }
+  25% { transform: translate(calc(-50% + 2px), 0px); }
+  50% { transform: translate(calc(-50% + 5px), 0px); }
+  75% { transform: translate(calc(-50% - 1px), 0px); }
+}
+
+.cat-eyes-idle {
+  animation: cat-eyes-idle 6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
