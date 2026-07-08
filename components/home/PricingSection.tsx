@@ -42,7 +42,7 @@ export default function PricingSection({ lang }: PricingSectionProps) {
   return (
     <section id="pricing" className="relative">
       <ScrollyFrames
-        className="relative h-screen flex items-center"
+        className="relative min-h-screen flex items-center"
         innerClassName="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         pinSpacing={1200}
         startOffset={80}
@@ -116,47 +116,6 @@ export default function PricingSection({ lang }: PricingSectionProps) {
           </div>
         </div>
 
-        {plans.map((plan, idx) => (
-          <CardModal
-            key={plan.nameKey}
-            isOpen={openPlan === idx}
-            onClose={() => setOpenPlan(null)}
-            title={lang[plan.nameKey as keyof typeof lang] as string}
-          >
-            <div className="mb-4">
-              <div className="flex items-baseline gap-1">
-                <span className="text-sm text-sc-muted">
-                  {lang[plan.periodKey as keyof typeof lang] as string}
-                </span>
-                <span className="text-3xl font-black text-white">
-                  {lang[plan.priceKey as keyof typeof lang] as string}
-                </span>
-              </div>
-            </div>
-            <ul className="space-y-2.5">
-              {plan.features.map((featKey) => (
-                <li key={featKey} className="flex items-start gap-2">
-                  <Check className="w-4 h-4 text-sc-primary shrink-0 mt-0.5" />
-                  <span className="text-sm text-sc-muted">
-                    {lang[featKey as keyof typeof lang] as string}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <a
-              href="#contact"
-              onClick={() => setOpenPlan(null)}
-              className={`block w-full py-3 mt-6 rounded-xl text-center font-medium transition-colors duration-200 ${
-                plan.featured
-                  ? "bg-sc-primary text-white hover:bg-sc-primary/80 shadow-lg shadow-sc-primary/25"
-                  : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
-              }`}
-            >
-              {lang.pricing_button}
-            </a>
-          </CardModal>
-        ))}
-
         <div className="flex flex-col items-center justify-center w-full text-center">
           <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 max-w-2xl">
             {lang.pricing_ideal_heading}
@@ -195,6 +154,47 @@ export default function PricingSection({ lang }: PricingSectionProps) {
           )}
         </div>
       </ScrollyFrames>
+
+      {plans.map((plan, idx) => (
+        <CardModal
+          key={plan.nameKey}
+          isOpen={openPlan === idx}
+          onClose={() => setOpenPlan(null)}
+          title={lang[plan.nameKey as keyof typeof lang] as string}
+        >
+          <div className="mb-4">
+            <div className="flex items-baseline gap-1">
+              <span className="text-sm text-sc-muted">
+                {lang[plan.periodKey as keyof typeof lang] as string}
+              </span>
+              <span className="text-3xl font-black text-white">
+                {lang[plan.priceKey as keyof typeof lang] as string}
+              </span>
+            </div>
+          </div>
+          <ul className="space-y-2.5">
+            {plan.features.map((featKey) => (
+              <li key={featKey} className="flex items-start gap-2">
+                <Check className="w-4 h-4 text-sc-primary shrink-0 mt-0.5" />
+                <span className="text-sm text-sc-muted">
+                  {lang[featKey as keyof typeof lang] as string}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <a
+            href="#contact"
+            onClick={() => setOpenPlan(null)}
+            className={`block w-full py-3 mt-6 rounded-xl text-center font-medium transition-colors duration-200 ${
+              plan.featured
+                ? "bg-sc-primary text-white hover:bg-sc-primary/80 shadow-lg shadow-sc-primary/25"
+                : "bg-white/5 text-white hover:bg-white/10 border border-white/10"
+            }`}
+          >
+            {lang.pricing_button}
+          </a>
+        </CardModal>
+      ))}
     </section>
   )
 }

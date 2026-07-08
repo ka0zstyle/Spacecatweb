@@ -22,7 +22,7 @@ export default function AboutSection({ lang }: AboutSectionProps) {
   return (
     <section id="about" className="relative">
       <ScrollyFrames
-        className="relative h-screen flex items-center"
+        className="relative min-h-screen flex items-center"
         innerClassName="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         pinSpacing={2000}
         startOffset={80}

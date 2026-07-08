@@ -16,7 +16,7 @@ export default function PaymentSection({ lang }: PaymentSectionProps) {
   return (
     <section id="payment" className="relative">
       <ScrollyFrames
-        className="relative h-screen flex items-center"
+        className="relative min-h-screen flex items-center"
         innerClassName="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         pinSpacing={1200}
         startOffset={80}

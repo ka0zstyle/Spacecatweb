@@ -86,7 +86,7 @@ function BlogSectionInner({ lang }: BlogSectionProps) {
   return (
     <section id="blog" className="relative">
       <ScrollyFrames
-        className="relative h-screen flex items-center"
+        className="relative min-h-screen flex items-center"
         innerClassName="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         pinSpacing={1200}
         startOffset={80}
@@ -180,32 +180,33 @@ function BlogSectionInner({ lang }: BlogSectionProps) {
           </a>
         </div>
 
-        {posts.map((post, idx) => (
-          <CardModal
-            key={post.slug}
-            isOpen={openPost === idx}
-            onClose={() => setOpenPost(null)}
-            title={post.title}
-          >
-            <div className="flex items-center gap-4 mb-4 text-xs text-sc-muted">
-              <span className="px-2 py-1 rounded-full bg-sc-primary/10 text-sc-primary text-xs font-medium">
-                {post.category}
-              </span>
-              <span className="flex items-center gap-1">
-                <Calendar size={12} />
-                {post.date}
-              </span>
-              <span className="flex items-center gap-1">
-                <User size={12} />
-                {post.author}
-              </span>
-            </div>
-            <p className="text-sc-muted leading-relaxed">
-              {post.excerpt}
-            </p>
-          </CardModal>
-        ))}
       </ScrollyFrames>
+
+      {posts.map((post, idx) => (
+        <CardModal
+          key={post.slug}
+          isOpen={openPost === idx}
+          onClose={() => setOpenPost(null)}
+          title={post.title}
+        >
+          <div className="flex items-center gap-4 mb-4 text-xs text-sc-muted">
+            <span className="px-2 py-1 rounded-full bg-sc-primary/10 text-sc-primary text-xs font-medium">
+              {post.category}
+            </span>
+            <span className="flex items-center gap-1">
+              <Calendar size={12} />
+              {post.date}
+            </span>
+            <span className="flex items-center gap-1">
+              <User size={12} />
+              {post.author}
+            </span>
+          </div>
+          <p className="text-sc-muted leading-relaxed">
+            {post.excerpt}
+          </p>
+        </CardModal>
+      ))}
     </section>
   )
 }
