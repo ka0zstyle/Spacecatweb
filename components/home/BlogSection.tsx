@@ -88,58 +88,62 @@ function BlogSectionInner({ lang }: BlogSectionProps) {
       <ScrollyFrames
         className="relative min-h-screen flex items-center"
         innerClassName="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-        pinSpacing={1200}
+        pinSpacing={2000}
         startOffset={80}
         showProgress={true}
       >
-        <div className="flex flex-col items-center justify-center w-full text-center">
-          <span className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full text-xs font-mono tracking-[0.3em] uppercase text-sc-primary border border-sc-primary/30 bg-sc-primary/5">
-            <BookOpen size={12} />
-            {lang.nav_blog}
-          </span>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold max-w-3xl">
-            {lang.blog_title}
-          </h2>
+        {/* Frame 1: Header + Featured post */}
+        <div className="flex flex-col items-center justify-center w-full">
+          <div className="flex flex-col items-center justify-center w-full text-center mb-8">
+            <span className="inline-flex items-center gap-2 px-3 py-1 mb-4 rounded-full text-xs font-mono tracking-[0.3em] uppercase text-sc-primary border border-sc-primary/30 bg-sc-primary/5">
+              <BookOpen size={12} />
+              {lang.nav_blog}
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold max-w-3xl">
+              {lang.blog_title}
+            </h2>
+          </div>
+
+          {featuredPost && (
+            <article className="flex items-center justify-center w-full">
+              <button
+                onClick={() => setOpenPost(0)}
+                className="group text-left w-full max-w-4xl rounded-2xl bg-sc-card/40 backdrop-blur-md border border-white/10 overflow-hidden hover:border-sc-primary/30 transition-all hover:-translate-y-1 cursor-pointer"
+              >
+                <div className="aspect-[21/9] bg-gradient-to-br from-sc-primary/20 to-sc-accent/10 flex items-center justify-center">
+                  <span className="text-6xl font-black text-white/10">{featuredPost.category[0]}</span>
+                </div>
+                <div className="p-8">
+                  <div className="flex items-center gap-4 mb-4 text-xs text-sc-muted">
+                    <span className="px-2 py-1 rounded-full bg-sc-primary/10 text-sc-primary text-xs font-medium">
+                      {lang.blog_featured_label}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Calendar size={12} />
+                      {featuredPost.date}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <User size={12} />
+                      {featuredPost.author}
+                    </span>
+                  </div>
+                  <h3 className="text-2xl sm:text-3xl font-semibold text-white mb-3 group-hover:text-sc-primary transition-colors">
+                    {featuredPost.title}
+                  </h3>
+                  <p className="text-sc-muted leading-relaxed mb-5 line-clamp-2">
+                    {featuredPost.excerpt}
+                  </p>
+                  <div className="inline-flex items-center gap-1 text-sm text-sc-primary font-medium">
+                    {lang.blog_read_more}
+                    <ArrowRight size={14} />
+                  </div>
+                </div>
+              </button>
+            </article>
+          )}
         </div>
 
-        {featuredPost && (
-          <article className="flex items-center justify-center w-full">
-            <button
-              onClick={() => setOpenPost(0)}
-              className="group text-left w-full max-w-4xl rounded-2xl bg-sc-card/40 backdrop-blur-md border border-white/10 overflow-hidden hover:border-sc-primary/30 transition-all hover:-translate-y-1 cursor-pointer"
-            >
-              <div className="aspect-[21/9] bg-gradient-to-br from-sc-primary/20 to-sc-accent/10 flex items-center justify-center">
-                <span className="text-6xl font-black text-white/10">{featuredPost.category[0]}</span>
-              </div>
-              <div className="p-8">
-                <div className="flex items-center gap-4 mb-4 text-xs text-sc-muted">
-                  <span className="px-2 py-1 rounded-full bg-sc-primary/10 text-sc-primary text-xs font-medium">
-                    {lang.blog_featured_label}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Calendar size={12} />
-                    {featuredPost.date}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <User size={12} />
-                    {featuredPost.author}
-                  </span>
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-semibold text-white mb-3 group-hover:text-sc-primary transition-colors">
-                  {featuredPost.title}
-                </h3>
-                <p className="text-sc-muted leading-relaxed mb-5 line-clamp-2">
-                  {featuredPost.excerpt}
-                </p>
-                <div className="inline-flex items-center gap-1 text-sm text-sc-primary font-medium">
-                  {lang.blog_read_more}
-                  <ArrowRight size={14} />
-                </div>
-              </div>
-            </button>
-          </article>
-        )}
-
+        {/* Frame 2: Secondary posts + view all */}
         <div className="flex flex-col items-center justify-center w-full">
           <h3 className="text-xl sm:text-2xl font-bold mb-6 text-sc-primary/90">
             {lang.blog_more_articles}
