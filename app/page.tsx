@@ -53,9 +53,7 @@ export async function generateMetadata({
       type: "website",
       images: [
         {
-          url: "/assets/images/SpaceCatWeb.webp",
-          width: 1200,
-          height: 630,
+          url: "/assets/images/spacecatweblogo.png",
           alt: "SpaceCatWeb",
         },
       ],
@@ -66,7 +64,7 @@ export async function generateMetadata({
       description: isEn
         ? "Professional web development, SEO, e-commerce, and digital marketing."
         : "Desarrollo web profesional, SEO, e-commerce y marketing digital.",
-      images: ["/assets/images/SpaceCatWeb.webp"],
+      images: ["/assets/images/spacecatweblogo.png"],
     },
     robots: { index: true, follow: true },
   }
