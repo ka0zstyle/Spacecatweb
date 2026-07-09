@@ -148,10 +148,11 @@ export default function HeroSection({ lang }: HeroSectionProps) {
     function startEyeIdle() {
       if (!eyesImageRef.current) return
       eyeIdleActive = true
+      const isMobile = window.innerWidth <= 768
       const lookAround = () => {
         if (!eyeIdleActive || !eyesImageRef.current) return
-        const tx = (Math.random() - 0.5) * 10
-        const ty = (Math.random() - 0.5) * 4
+        const tx = (Math.random() - 0.5) * (isMobile ? 5 : 10)
+        const ty = (Math.random() - 0.5) * (isMobile ? 2 : 4)
         gsap.to(eyesImageRef.current, {
           x: tx,
           y: ty,
@@ -323,22 +324,23 @@ export default function HeroSection({ lang }: HeroSectionProps) {
 
     // Phase 4.5: Zero-G subtle floating
     tl.call(() => {
+      const isMobile = window.innerWidth <= 768
       gsap.to(catBody, {
-        y: -8,
+        y: isMobile ? -4 : -8,
         duration: 3.0,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
       })
       gsap.to(catBody, {
-        x: 4,
+        x: isMobile ? 2 : 4,
         duration: 4.0,
         ease: "sine.inOut",
         yoyo: true,
         repeat: -1,
       })
       gsap.to(catBody, {
-        rotation: -4,
+        rotation: isMobile ? -2 : -4,
         duration: 4.5,
         ease: "sine.inOut",
         yoyo: true,
@@ -740,7 +742,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
       const dx = Math.max(-1, Math.min(1, ((window.innerWidth / 2) - sx) / (window.innerWidth / 2)))
       const dy = Math.max(-1, Math.min(1, ((window.innerHeight / 2) - sy) / (window.innerHeight / 2)))
       eyesImageRef.current.style.transition = "transform 0.4s ease-out"
-      eyesImageRef.current.style.transform = `translate(calc(-50% + ${dx * 3}px), ${dy * 1}px)`
+      eyesImageRef.current.style.transform = `translate(${dx * 3}px, ${dy * 1}px)`
     }
 
     const onHeroMobileClick = (e: MouseEvent) => {
@@ -751,7 +753,7 @@ export default function HeroSection({ lang }: HeroSectionProps) {
       const normX = Math.max(-1, Math.min(1, dx / (window.innerWidth / 2)))
       const normY = Math.max(-1, Math.min(1, dy / (window.innerHeight / 2)))
       eyesImageRef.current.style.transition = "none"
-      eyesImageRef.current.style.transform = `translate(calc(-50% + ${normX * 6}px), ${normY * 2}px)`
+      eyesImageRef.current.style.transform = `translate(${normX * 6}px, ${normY * 2}px)`
       setTimeout(() => {
         if (eyesImageRef.current) {
           eyesImageRef.current.style.transition = "transform 0.4s ease-out"
@@ -951,9 +953,8 @@ export default function HeroSection({ lang }: HeroSectionProps) {
             className="absolute pointer-events-none"
             style={{
               top: "23.0%",
-              left: "63.5%",
+              left: "42.5%",
               width: "42.0%",
-              transform: "translate(-50%, 0px)",
               zIndex: 2,
             }}
           >

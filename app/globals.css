@@ -482,6 +482,7 @@ select,
   top: 42%;
   transform: translate(-50%, -50%);
   filter: drop-shadow(0 12px 36px rgba(0,0,0,.55));
+  will-change: transform;
 }
 
 .hero-cat-mouse {
@@ -502,6 +503,8 @@ select,
   user-select: none;
   overflow: visible;
   margin: auto;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .cat-body-img {
