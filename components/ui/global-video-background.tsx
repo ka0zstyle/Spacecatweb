@@ -18,7 +18,7 @@ export default function GlobalVideoBackground() {
     if (!video || !overlay || !wrap) return
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches
 
     if (prefersReducedMotion) {
@@ -26,6 +26,9 @@ export default function GlobalVideoBackground() {
       overlay.style.backgroundColor = "rgba(0, 0, 0, 0.6)"
       return
     }
+
+    const hero = document.getElementById("home")
+    if (!hero) return
 
     video.style.filter = "blur(0px) brightness(1) saturate(1)"
     overlay.style.backgroundColor = "rgba(0, 0, 0, 0)"
@@ -37,15 +40,10 @@ export default function GlobalVideoBackground() {
     let currentZoom = 1
     let currentRotation = 0
     const SMOOTH = 0.08
+    let raf = 0
+    let running = false
 
-    let raf: number
     const tick = () => {
-      const hero = document.getElementById("home")
-      if (!hero) {
-        raf = requestAnimationFrame(tick)
-        return
-      }
-
       const heroTop = hero.getBoundingClientRect().top
       const heroHeight = hero.offsetHeight
       const vh = window.innerHeight
@@ -62,8 +60,8 @@ export default function GlobalVideoBackground() {
         progress = 1
       }
 
-      const gameZoom = (window as any).__gameZoom ?? 1
-      const gameRotation = (window as any).__gameRotation ?? 0
+      const gameZoom = (window as unknown as { __gameZoom?: number }).__gameZoom ?? 1
+      const gameRotation = (window as unknown as { __gameRotation?: number }).__gameRotation ?? 0
 
       const targetZoom = 1 + (gameZoom - 1)
       const targetRotation = gameRotation
@@ -82,10 +80,26 @@ export default function GlobalVideoBackground() {
 
       raf = requestAnimationFrame(tick)
     }
-    raf = requestAnimationFrame(tick)
+
+    const start = () => {
+      if (running) return
+      running = true
+      raf = requestAnimationFrame(tick)
+    }
+    const stop = () => {
+      running = false
+      cancelAnimationFrame(raf)
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => (entry.isIntersecting ? start() : stop()),
+      { rootMargin: "200px" },
+    )
+    io.observe(hero)
 
     return () => {
-      cancelAnimationFrame(raf)
+      io.disconnect()
+      stop()
     }
   }, [])
 
@@ -102,16 +116,16 @@ export default function GlobalVideoBackground() {
         muted
         loop
         playsInline
+        preload="metadata"
+        poster="/assets/images/fondowall.webp"
         className="absolute inset-0 w-full h-full object-cover"
         style={{ transform: "scale(1.15)" }}
       >
+        <source src="/assets/images/space.webm" type="video/webm" />
         <source src="/assets/images/space.mp4" type="video/mp4" />
       </video>
 
-      <div
-        ref={overlayRef}
-        className="absolute inset-0 w-full h-full"
-      />
+      <div ref={overlayRef} className="absolute inset-0 w-full h-full" />
     </div>
   )
 }

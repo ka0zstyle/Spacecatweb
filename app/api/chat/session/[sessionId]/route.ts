@@ -1,18 +1,14 @@
 import { NextResponse } from "next/server"
 import sql from "@/lib/db"
+import { getOrCreateVisitorId } from "@/lib/visitor"
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ sessionId: string }> }
+  _request: Request,
+  { params }: { params: Promise<{ sessionId: string }> },
 ) {
   try {
     const { sessionId } = await params
-    const body = await request.json().catch(() => ({}))
-    const visitorId = (body.visitorId as string)?.trim()
-
-    if (!visitorId) {
-      return NextResponse.json({ error: "Falta visitorId" }, { status: 400 })
-    }
+    const visitorId = await getOrCreateVisitorId()
 
     const session = await sql`
       SELECT visitor_id FROM chat_sessions WHERE id = ${sessionId}

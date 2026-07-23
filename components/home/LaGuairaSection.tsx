@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef } from "react"
 import Image from "next/image"
 import { Heart, X, ChevronLeft, ChevronRight, Flame } from "lucide-react"
 import type { Lang } from "@/lib/lang"
+import { useScrollPosition } from "@/hooks/useScrollPosition"
 
 interface LaGuairaSectionProps {
   lang: Lang
@@ -16,21 +17,16 @@ const images = [
 ]
 
 function useParallax(ref: React.RefObject<HTMLElement | null>, speed: number = 0.3) {
-  const offsetRef = useRef(0)
-  useEffect(() => {
+  useScrollPosition<number>((s) => {
     const el = ref.current
-    if (!el) return
-    const onScroll = () => {
-      const rect = el.getBoundingClientRect()
-      const vh = window.innerHeight
-      const progress = (vh - rect.top) / (vh + rect.height)
-      offsetRef.current = (progress - 0.5) * speed * 100
-      el.style.setProperty("--parallax-y", `${offsetRef.current}px`)
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [ref, speed])
+    if (!el) return 0
+    const rect = el.getBoundingClientRect()
+    const vh = s.vh || window.innerHeight
+    const progress = (vh - rect.top) / (vh + rect.height)
+    const offset = (progress - 0.5) * speed * 100
+    el.style.setProperty("--parallax-y", `${offset}px`)
+    return offset
+  })
 }
 
 export default function LaGuairaSection({ lang }: LaGuairaSectionProps) {

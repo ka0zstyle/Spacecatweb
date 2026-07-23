@@ -1,18 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { ChevronUp } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useScrollPosition } from "@/hooks/useScrollPosition"
 
 export default function ScrollToTop() {
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 300)
-    window.addEventListener("scroll", onScroll, { passive: true })
-    onScroll()
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
+  const visible = useScrollPosition<boolean>((s) => s.scrollY > 300)
 
   return (
     <button
@@ -24,7 +17,7 @@ export default function ScrollToTop() {
         "transition-[opacity,transform,background-color,box-shadow] duration-300 ease-out",
         visible
           ? "opacity-100 translate-y-0 pointer-events-auto"
-          : "opacity-0 translate-y-4 pointer-events-none"
+          : "opacity-0 translate-y-4 pointer-events-none",
       )}
       aria-label="Scroll to top"
     >

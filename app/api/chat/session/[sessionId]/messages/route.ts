@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server"
 import sql from "@/lib/db"
+import { getOrCreateVisitorId } from "@/lib/visitor"
+import { sendTelegramChatNotification } from "@/lib/telegram-chat"
+
+const MAX_CONTENT = 2000
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID
@@ -8,67 +12,13 @@ function escapeMarkdown(text: string): string {
   return text.replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, "\\$&")
 }
 
-async function notifyTelegram(
-  sessionId: string,
-  visitorName: string | null,
-  content: string
-) {
-  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-    console.warn("[Telegram notify] Token o Chat ID no configurados")
-    return
-  }
-
-  try {
-    const shortId = sessionId.slice(0, 8)
-    const name = escapeMarkdown(visitorName?.trim() || "Visitante")
-    const preview = escapeMarkdown(content.length > 300 ? content.substring(0, 300) + "…" : content)
-
-    const timestamp = new Date().toLocaleString("es-VE", {
-      timeZone: "America/Caracas",
-      hour: "2-digit",
-      minute: "2-digit",
-      day: "2-digit",
-      month: "2-digit",
-    })
-
-    const text = [
-      `💬 *${name}*: ${preview}`,
-      `_${escapeMarkdown(timestamp)}_`,
-    ].join("\n")
-
-    const res = await fetch(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text,
-          parse_mode: "MarkdownV2",
-          disable_web_page_preview: true,
-        }),
-      }
-    )
-
-    if (!res.ok) {
-      const errBody = await res.text().catch(() => "")
-      console.error("[Telegram notify] Error:", res.status, errBody)
-    } else {
-      console.log("[Telegram notify] Notificación enviada correctamente")
-    }
-  } catch (err) {
-    console.error("[Telegram notify] Excepción al notificar:", err)
-  }
-}
-
 export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ sessionId: string }> }
+  _request: Request,
+  { params }: { params: Promise<{ sessionId: string }> },
 ) {
   try {
     const { sessionId } = await params
-    const url = new URL(request.url)
-    const visitorId = url.searchParams.get("visitorId") ?? undefined
+    const visitorId = await getOrCreateVisitorId()
 
     const session = await sql`
       SELECT visitor_id, status
@@ -91,11 +41,11 @@ export async function GET(
     `
 
     return NextResponse.json({
-      messages: (messages as Array<Record<string, unknown>>).map((m: Record<string, unknown>) => ({
-        id: m.id as string,
-        role: m.role as string,
-        content: m.content as string,
-        createdAt: m.created_at as string,
+      messages: (messages as Array<Record<string, unknown>>).map((m) => ({
+        id: String(m.id),
+        role: String(m.role),
+        content: String(m.content),
+        createdAt: String(m.created_at),
       })),
       status: session[0].status,
     })
@@ -107,20 +57,19 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ sessionId: string }> }
+  { params }: { params: Promise<{ sessionId: string }> },
 ) {
   try {
     const { sessionId } = await params
     const body = await request.json().catch(() => ({}))
-    const content = (body.content as string)?.trim() ?? ""
-    const visitorId = (body.visitorId as string)?.trim()
-
-    if (!visitorId) {
-      return NextResponse.json({ error: "Falta visitorId" }, { status: 400 })
-    }
+    const content = typeof body.content === "string" ? body.content.trim() : ""
+    const visitorId = await getOrCreateVisitorId()
 
     if (!content) {
       return NextResponse.json({ error: "Escribe un mensaje" }, { status: 400 })
+    }
+    if (content.length > MAX_CONTENT) {
+      return NextResponse.json({ error: "Mensaje demasiado largo" }, { status: 400 })
     }
 
     const session = await sql`
@@ -136,10 +85,7 @@ export async function POST(
     }
 
     if (session[0].status === "CLOSED") {
-      return NextResponse.json(
-        { error: "Esta conversación está cerrada" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Esta conversación está cerrada" }, { status: 400 })
     }
 
     const created = await sql`
@@ -154,7 +100,15 @@ export async function POST(
 
     const msg = created[0]
 
-    await notifyTelegram(sessionId, session[0].visitor_name, content)
+    if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+      sendTelegramChatNotification(
+        sessionId,
+        session[0].visitor_name,
+        content,
+        TELEGRAM_BOT_TOKEN,
+        TELEGRAM_CHAT_ID,
+      ).catch(() => {})
+    }
 
     return NextResponse.json({
       id: msg.id,

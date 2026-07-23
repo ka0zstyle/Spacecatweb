@@ -1,15 +1,10 @@
-import type { en } from "./en"
+import { en } from "./en"
+import { es } from "./es"
 
 export type Lang = typeof en
 
-const enModule = require("./en").en as Lang
-const esModule = require("./es").es as Lang
-
-export const languages: Record<string, Lang> = {
-  en: enModule,
-  es: esModule,
-}
+export const languages: Record<string, Lang> = { en, es }
 
 export function getLang(locale: string): Lang {
-  return languages[locale] || languages["es"]
+  return languages[locale] ?? languages.es
 }

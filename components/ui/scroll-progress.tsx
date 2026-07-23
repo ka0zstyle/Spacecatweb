@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react"
 import type { Lang } from "@/lib/lang"
+import { useScrollPosition } from "@/hooks/useScrollPosition"
 
 const SECTIONS = [
   "home",
@@ -38,8 +39,6 @@ export default function ScrollProgress({ lang }: ScrollProgressProps) {
   }
 
   useEffect(() => {
-    let rafId = 0
-
     const positionMarkers = () => {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
       if (docHeight <= 0) return
@@ -53,74 +52,57 @@ export default function ScrollProgress({ lang }: ScrollProgressProps) {
       })
     }
 
-    const update = () => {
-      if (!fillRef.current || !dotRef.current) return
-      const scrollTop = window.scrollY
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      const progress = docHeight > 0 ? Math.min(1, Math.max(0, scrollTop / docHeight)) : 0
-
-      fillRef.current.style.transform = `scaleY(${progress})`
-      dotRef.current.style.top = `${progress * 100}%`
-
-      const probeY = window.scrollY + window.innerHeight * 0.35
-      let active: string = SECTIONS[0]
-      for (const id of SECTIONS) {
-        const el = document.getElementById(id)
-        if (!el) continue
-        const top = el.getBoundingClientRect().top + window.scrollY
-        if (probeY >= top) active = id
-      }
-
-      if (active !== activeRef.current) {
-        const prev = markerRefs.current.get(activeRef.current)
-        const curr = markerRefs.current.get(active)
-        if (prev) {
-          prev.style.background = "rgba(255,255,255,0.3)"
-          prev.style.transform = "translate(-50%, -50%) scale(1)"
-          prev.style.boxShadow = ""
-        }
-        if (curr) {
-          curr.style.background = "rgba(243,156,18,1)"
-          curr.style.transform = "translate(-50%, -50%) scale(1.6)"
-          curr.style.boxShadow = "0 0 6px rgba(243,156,18,0.8)"
-        }
-        if (labelRef.current) labelRef.current.textContent = labels[active] ?? ""
-        activeRef.current = active
-      }
-    }
-
-    const onScroll = () => {
-      cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(update)
-    }
-
     positionMarkers()
-    update()
     if (labelRef.current) labelRef.current.textContent = labels[SECTIONS[0]]
 
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", () => {
-      positionMarkers()
-      onScroll()
-    })
-
-    const ro = new ResizeObserver(() => {
-      positionMarkers()
-      onScroll()
-    })
+    const ro = new ResizeObserver(positionMarkers)
     ro.observe(document.body)
+    window.addEventListener("resize", positionMarkers, { passive: true })
 
     return () => {
-      cancelAnimationFrame(rafId)
-      window.removeEventListener("scroll", onScroll)
       ro.disconnect()
+      window.removeEventListener("resize", positionMarkers)
     }
   }, [])
 
+  useScrollPosition<{ progress: number; active: string }>((s) => {
+    const docHeight = document.documentElement.scrollHeight - s.vh
+    const progress = docHeight > 0 ? Math.min(1, Math.max(0, s.scrollY / docHeight)) : 0
+
+    const probeY = s.scrollY + s.vh * 0.35
+    let active: string = SECTIONS[0]
+    for (const id of SECTIONS) {
+      const el = document.getElementById(id)
+      if (!el) continue
+      const top = el.getBoundingClientRect().top + s.scrollY
+      if (probeY >= top) active = id
+    }
+
+    if (fillRef.current) fillRef.current.style.transform = `scaleY(${progress})`
+    if (dotRef.current) dotRef.current.style.top = `${progress * 100}%`
+
+    if (active !== activeRef.current) {
+      const prev = markerRefs.current.get(activeRef.current)
+      const curr = markerRefs.current.get(active)
+      if (prev) {
+        prev.style.background = "rgba(255,255,255,0.3)"
+        prev.style.transform = "translate(-50%, -50%) scale(1)"
+        prev.style.boxShadow = ""
+      }
+      if (curr) {
+        curr.style.background = "rgba(243,156,18,1)"
+        curr.style.transform = "translate(-50%, -50%) scale(1.6)"
+        curr.style.boxShadow = "0 0 6px rgba(243,156,18,0.8)"
+      }
+      if (labelRef.current) labelRef.current.textContent = labels[active] ?? ""
+      activeRef.current = active
+    }
+
+    return { progress, active }
+  })
+
   return (
-    <div
-      className="fixed right-3 sm:right-4 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center select-none"
-    >
+    <div className="fixed right-3 sm:right-4 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center select-none">
       <span
         ref={labelRef}
         className="absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-mono tracking-[0.2em] uppercase text-sc-accent whitespace-nowrap transition-opacity duration-300"

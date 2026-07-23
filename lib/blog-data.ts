@@ -12,7 +12,7 @@ export interface BlogPost {
 export const posts: BlogPost[] = [
   {
     slug: "building-modern-web-apps-nextjs-16",
-    date: "Jun 15, 2026",
+    date: "2026-06-15",
     author: "Johandri Suarez",
     category: { es: "Desarrollo", en: "Development" },
     title: {
@@ -67,7 +67,7 @@ Next.js 16 represents a generational leap in web development. If you haven't tri
   },
   {
     slug: "future-of-web-performance",
-    date: "Jun 10, 2026",
+    date: "2026-06-10",
     author: "Johandri Suarez",
     category: { es: "Rendimiento", en: "Performance" },
     title: {
@@ -130,7 +130,7 @@ A site that loads in 1 second has 3x more conversions than one that loads in 5 s
   },
   {
     slug: "responsive-design-best-practices-2026",
-    date: "Jun 5, 2026",
+    date: "2026-06-05",
     author: "Johandri Suarez",
     category: { es: "Diseno", en: "Design" },
     title: {
@@ -199,7 +199,7 @@ Use \`clamp()\` to create font sizes that scale fluidly between mobile and deskt
   },
   {
     slug: "rest-vs-graphql",
-    date: "May 28, 2026",
+    date: "2026-05-28",
     author: "Johandri Suarez",
     category: { es: "Backend", en: "Backend" },
     title: {
@@ -278,7 +278,7 @@ In my project, GraphQL reduced HTTP requests by 60% and significantly improved t
   },
   {
     slug: "venezuelan-developer-journey",
-    date: "May 20, 2026",
+    date: "2026-05-20",
     author: "Johandri Suarez",
     category: { es: "Carrera", en: "Career" },
     title: {
@@ -359,7 +359,7 @@ Venezuela has enormous potential in technology. I'm convinced that the next big 
   },
   {
     slug: "typescript-for-js-developers",
-    date: "May 12, 2026",
+    date: "2026-05-12",
     author: "Johandri Suarez",
     category: { es: "TypeScript", en: "TypeScript" },
     title: {
@@ -484,4 +484,14 @@ export function getLocalePost(post: BlogPost, lang: "es" | "en") {
     content: post.content[lang],
     category: post.category[lang],
   }
+}
+
+export function formatPostDate(iso: string, lang: "es" | "en"): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso
+  return d.toLocaleDateString(lang === "en" ? "en-US" : "es-ES", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  })
 }

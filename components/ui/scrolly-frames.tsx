@@ -25,17 +25,21 @@ interface ScrollyFramesProps {
   crossfade?: number
   showProgress?: boolean
   progressClassName?: string
+  pin?: boolean
+  sectionId?: string
 }
 
 export default function ScrollyFrames({
   children,
-  pinSpacing = 1800,
+  pinSpacing = 900,
   startOffset = 80,
   className,
   innerClassName,
   crossfade = 0.35,
   showProgress = true,
   progressClassName,
+  pin = true,
+  sectionId,
 }: ScrollyFramesProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const framesRef = useRef<HTMLDivElement[]>([])
@@ -76,7 +80,7 @@ export default function ScrollyFrames({
     if (frames.length === 0) return
 
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches
 
     if (prefersReducedMotion) {
@@ -94,7 +98,7 @@ export default function ScrollyFrames({
           trigger: root,
           start: `top top+=${startOffset}`,
           end: `+=${pinSpacing}`,
-          pin: true,
+          pin: pin,
           scrub: 0.5,
           anticipatePin: 1,
           invalidateOnRefresh: true,
@@ -104,13 +108,12 @@ export default function ScrollyFrames({
             }
             const idx = Math.min(
               frames.length - 1,
-              Math.floor(self.progress * frames.length * 0.9999)
+              Math.floor(self.progress * frames.length * 0.9999),
             )
             dotsRef.current.forEach((d, i) => {
               if (!d) return
-              d.style.background = i === idx
-                ? "rgba(243,156,18,1)"
-                : "rgba(255,255,255,0.25)"
+              d.style.background =
+                i === idx ? "rgba(243,156,18,1)" : "rgba(255,255,255,0.25)"
               d.style.transform = i === idx ? "scale(1.6)" : "scale(1)"
             })
           },
@@ -128,22 +131,36 @@ export default function ScrollyFrames({
         if (i > 0) {
           tl.to(
             frame,
-            { opacity: 1, visibility: "visible", scale: 1, y: 0, duration: fadeInEnd - start, ease: "power2.out" },
-            start
+            {
+              opacity: 1,
+              visibility: "visible",
+              scale: 1,
+              y: 0,
+              duration: fadeInEnd - start,
+              ease: "power2.out",
+            },
+            start,
           )
         }
         if (i < frames.length - 1) {
           tl.to(
             frame,
-            { opacity: 0, visibility: "hidden", scale: 0.96, y: -24, duration: fadeOutEnd - fadeOut, ease: "power2.in" },
-            fadeOut
+            {
+              opacity: 0,
+              visibility: "hidden",
+              scale: 0.96,
+              y: -24,
+              duration: fadeOutEnd - fadeOut,
+              ease: "power2.in",
+            },
+            fadeOut,
           )
         }
       })
     }, root)
 
     return () => ctx.revert()
-  }, [pinSpacing, startOffset, crossfade, isMobile, mounted])
+  }, [pinSpacing, startOffset, crossfade, isMobile, mounted, pin])
 
   const childrenArr = Children.toArray(children).filter(isValidElement)
 
@@ -171,7 +188,7 @@ export default function ScrollyFrames({
   }
 
   return (
-    <div ref={rootRef} className={className}>
+    <div ref={rootRef} id={sectionId} className={className}>
       <div className={`absolute inset-0 ${innerClassName ?? ""}`}>
         <div className="relative w-full h-full">
           {childrenArr.map((child, i) => (
@@ -181,7 +198,10 @@ export default function ScrollyFrames({
                 if (el) framesRef.current[i] = el
               }}
               className="scrolly-frame absolute inset-0 w-full h-full flex items-center justify-center"
-              style={{ opacity: i === 0 ? 1 : 0, visibility: i === 0 ? "visible" : "hidden" }}
+              style={{
+                opacity: i === 0 ? 1 : 0,
+                visibility: i === 0 ? "visible" : "hidden",
+              }}
             >
               {child}
             </div>

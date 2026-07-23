@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Menu, X, Square } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Lang } from "@/lib/lang"
 import { useGame } from "@/app/providers"
+import { useScrollPosition } from "@/hooks/useScrollPosition"
 
 interface HeaderProps {
   lang: Lang
@@ -13,41 +14,43 @@ interface HeaderProps {
 
 const navItems = ["home", "about", "services", "portfolio", "pricing", "blog", "laguaira", "contact"] as const
 
+const SECTION_IDS = ["home", "about", "services", "portfolio", "pricing", "blog", "contact"] as const
+
 export default function Header({ lang, currentLocale }: HeaderProps) {
   const { gameActive, setGameActive } = useGame()
-  const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState("home")
+  const [activeSection, setActiveSection] = useState<string>("home")
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50)
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  const scrolled = useScrollPosition<boolean>((s) => s.scrollY > 50)
 
+  useScrollPosition<string>((s) => {
+    const probeY = s.scrollY + 150
+    let active: string = SECTION_IDS[0]
+    for (const id of SECTION_IDS) {
+      const el = document.getElementById(id)
+      if (!el) continue
+      const top = el.getBoundingClientRect().top + s.scrollY
+      if (probeY >= top) active = id
+    }
+    return active
+  }) // value unused at top level; we mirror it via a side-effect below
+  // (kept simple: a small effect that reads the same selector via the hook)
   useEffect(() => {
-    let rafId = 0
-    const updateActiveSection = () => {
-      const sections = ["home", "about", "services", "portfolio", "pricing", "blog", "contact"]
+    const onScroll = () => {
       const probeY = window.scrollY + 150
-      let active = sections[0]
-      for (const id of sections) {
+      let active: string = SECTION_IDS[0]
+      for (const id of SECTION_IDS) {
         const el = document.getElementById(id)
         if (!el) continue
         const top = el.getBoundingClientRect().top + window.scrollY
         if (probeY >= top) active = id
       }
-      setActiveSection(prev => prev !== active ? active : prev)
+      setActiveSection((prev) => (prev === active ? prev : active))
     }
-    const onScroll = () => {
-      cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(updateActiveSection)
-    }
-    updateActiveSection()
+    onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("resize", onScroll, { passive: true })
     return () => {
-      cancelAnimationFrame(rafId)
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", onScroll)
     }
@@ -57,8 +60,8 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
     setMobileOpen(false)
     if (typeof window !== "undefined" && window.location.pathname === "/blog") {
       const params = new URLSearchParams(window.location.search)
-      const lang = params.get("lang") || "es"
-      window.location.href = `/?lang=${lang}#${id}`
+      const l = params.get("lang") || "es"
+      window.location.href = `/?lang=${l}#${id}`
       return
     }
     const el = document.getElementById(id)
@@ -77,7 +80,7 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
           mobileOpen ? "-translate-y-full" : "translate-y-0",
           scrolled
             ? "bg-sc-dark/80 backdrop-blur-xl border-b border-white/5 shadow-lg shadow-black/10"
-            : "bg-transparent"
+            : "bg-transparent",
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -99,7 +102,7 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
                     "relative px-4 py-3 min-h-11 text-sm font-medium rounded-lg transition-colors duration-200",
                     activeSection === item
                       ? "text-sc-primary"
-                      : "text-sc-muted hover:text-white"
+                      : "text-sc-muted hover:text-white",
                   )}
                 >
                   {lang[`nav_${item}` as keyof typeof lang] as string}
@@ -115,7 +118,7 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
                     "text-xs font-medium px-3 py-1.5 rounded min-h-[44px] flex items-center gap-1.5 transition-colors",
                     currentLocale === "en"
                       ? "text-sc-primary bg-sc-primary/10"
-                      : "text-sc-muted hover:text-white"
+                      : "text-sc-muted hover:text-white",
                   )}
                 >
                   <img src="/assets/images/flag-us.webp" alt="" className="w-4 h-4 rounded-full object-cover shrink-0" />
@@ -127,7 +130,7 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
                     "text-xs font-medium px-3 py-1.5 rounded min-h-[44px] flex items-center gap-1.5 transition-colors",
                     currentLocale === "es"
                       ? "text-sc-primary bg-sc-primary/10"
-                      : "text-sc-muted hover:text-white"
+                      : "text-sc-muted hover:text-white",
                   )}
                 >
                   <img src="/assets/images/flag-es.webp" alt="" className="w-4 h-4 rounded-full object-cover shrink-0" />
@@ -137,10 +140,10 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
             </nav>
 
             <button
-              onClick={() => gameActive ? setGameActive(false) : setMobileOpen(!mobileOpen)}
+              onClick={() => (gameActive ? setGameActive(false) : setMobileOpen(!mobileOpen))}
               className={cn(
                 "lg:hidden p-2 transition-colors",
-                gameActive ? "text-red-400 hover:text-red-300" : "text-sc-muted hover:text-white"
+                gameActive ? "text-red-400 hover:text-red-300" : "text-sc-muted hover:text-white",
               )}
               aria-label={gameActive ? "Stop game" : "Toggle menu"}
             >
@@ -153,7 +156,7 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
       <div
         className={cn(
           "lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300",
-          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         )}
         onClick={() => setMobileOpen(false)}
       />
@@ -161,15 +164,15 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
       <div
         className={cn(
           "lg:hidden fixed top-0 right-0 z-50 h-full w-72 bg-sc-dark/95 border-l border-white/5 shadow-2xl transition-transform duration-300 ease-out",
-          mobileOpen ? "translate-x-0" : "translate-x-full"
+          mobileOpen ? "translate-x-0" : "translate-x-full",
         )}
       >
         <div className="flex items-center justify-between p-4 border-b border-white/5">
           <img
-              src="/assets/images/SpaceCatWeb.webp"
-              alt="SpaceCatWeb"
-              className="h-6 w-auto"
-            />
+            src="/assets/images/SpaceCatWeb.webp"
+            alt="SpaceCatWeb"
+            className="h-6 w-auto"
+          />
           <button onClick={() => setMobileOpen(false)} className="p-2 text-sc-muted hover:text-white">
             <X size={20} />
           </button>
@@ -183,7 +186,7 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
                 "w-full text-left px-4 py-3 min-h-11 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center",
                 activeSection === item
                   ? "text-sc-primary bg-sc-primary/10"
-                  : "text-sc-muted hover:text-white hover:bg-white/5"
+                  : "text-sc-muted hover:text-white hover:bg-white/5",
               )}
               style={{ transitionDelay: `${i * 30}ms` }}
             >
@@ -197,7 +200,7 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
                 "flex-1 text-sm font-medium px-3 py-3 min-h-11 rounded-lg transition-colors flex items-center justify-center gap-2",
                 currentLocale === "en"
                   ? "text-sc-primary bg-sc-primary/10"
-                  : "text-sc-muted bg-white/5 hover:text-white"
+                  : "text-sc-muted bg-white/5 hover:text-white",
               )}
             >
               <img src="/assets/images/flag-us.webp" alt="" className="w-5 h-5 rounded-full object-cover shrink-0" />
@@ -209,7 +212,7 @@ export default function Header({ lang, currentLocale }: HeaderProps) {
                 "flex-1 text-sm font-medium px-3 py-3 min-h-11 rounded-lg transition-colors flex items-center justify-center gap-2",
                 currentLocale === "es"
                   ? "text-sc-primary bg-sc-primary/10"
-                  : "text-sc-muted bg-white/5 hover:text-white"
+                  : "text-sc-muted bg-white/5 hover:text-white",
               )}
             >
               <img src="/assets/images/flag-es.webp" alt="" className="w-5 h-5 rounded-full object-cover shrink-0" />

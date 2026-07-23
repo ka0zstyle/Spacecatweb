@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { getLang } from "@/lib/lang"
-import { posts, getLocalePost } from "@/lib/blog-data"
+import { posts, getLocalePost, formatPostDate } from "@/lib/blog-data"
 import { Calendar, User, ArrowRight, BookOpen, ArrowLeft } from "lucide-react"
 
 const baseUrl = "https://spacecatweb.com"
@@ -95,7 +95,7 @@ export default async function BlogPage({
                 </span>
                 <span className="flex items-center gap-1">
                   <Calendar size={12} />
-                  {featured.date}
+                  {formatPostDate(featured.date, typedLang)}
                 </span>
                 <span className="flex items-center gap-1">
                   <User size={12} />
@@ -135,7 +135,7 @@ export default async function BlogPage({
               <div className="flex items-center gap-3 mb-2 text-xs text-sc-muted">
                 <span className="flex items-center gap-1">
                   <Calendar size={11} />
-                  {post.date}
+                  {formatPostDate(post.date, typedLang)}
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-white/5 text-white/60">
                   {post.category}

@@ -6,6 +6,7 @@ import { Calendar, User, ArrowRight, BookOpen } from "lucide-react"
 import ScrollyFrames from "@/components/ui/scrolly-frames"
 import CardModal from "@/components/ui/card-modal"
 import type { Lang } from "@/lib/lang"
+import { formatPostDate, type BlogPost } from "@/lib/blog-data"
 
 interface BlogSectionProps {
   lang: Lang
@@ -162,7 +163,7 @@ function BlogSectionInner({ lang }: BlogSectionProps) {
                   <div className="flex items-center gap-3 mb-1 text-xs text-sc-muted">
                     <span className="flex items-center gap-1">
                       <Calendar size={11} />
-                      {post.date}
+                      {formatPostDate(post.date, locale === "en" ? "en" : "es")}
                     </span>
                   </div>
                   <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-sc-primary transition-colors line-clamp-2">
@@ -199,7 +200,7 @@ function BlogSectionInner({ lang }: BlogSectionProps) {
             </span>
             <span className="flex items-center gap-1">
               <Calendar size={12} />
-              {post.date}
+              {formatPostDate(post.date, locale === "en" ? "en" : "es")}
             </span>
             <span className="flex items-center gap-1">
               <User size={12} />

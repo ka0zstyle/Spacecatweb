@@ -15,7 +15,6 @@ import { useGame } from "@/app/providers"
 import { EmojiPicker } from "@/components/chat/EmojiPicker"
 import { playChatNotificationSound } from "@/lib/chat-sound"
 
-const VISITOR_ID_KEY = "spacecat_chat_visitor_id"
 const CHAT_SESSION_KEY = "spacecat_chat_session_id"
 const CHAT_MUTED_KEY = "spacecat_chat_muted"
 
@@ -24,16 +23,6 @@ type ChatMessage = {
   role: "VISITOR" | "ADMIN"
   content: string
   createdAt: string
-}
-
-function getOrCreateVisitorId(): string {
-  if (typeof window === "undefined") return ""
-  let id = localStorage.getItem(VISITOR_ID_KEY)
-  if (!id) {
-    id = crypto.randomUUID?.() ?? `v-${Date.now()}-${Math.random().toString(36).slice(2)}`
-    localStorage.setItem(VISITOR_ID_KEY, id)
-  }
-  return id
 }
 
 function getStoredSessionId(): string | null {
@@ -68,7 +57,6 @@ export default function ChatBubble() {
   const [formWhatsApp, setFormWhatsApp] = useState("")
   const [formError, setFormError] = useState("")
   const [sessionId, setSessionId] = useState<string | null>(null)
-  const [visitorId, setVisitorId] = useState("")
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
@@ -104,16 +92,14 @@ export default function ChatBubble() {
   }, [])
 
   const startSession = useCallback(async (name: string, email: string, whatsapp: string) => {
-    const vid = getOrCreateVisitorId()
-    setVisitorId(vid)
     setLoading(true)
     setFormError("")
     try {
       const res = await fetch("/api/chat/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({
-          visitorId: vid,
           visitorName: name.trim(),
           visitorEmail: email.trim(),
           visitorWhatsApp: whatsapp.trim(),
@@ -129,9 +115,9 @@ export default function ChatBubble() {
       setShowForm(false)
       setSessionStatus("OPEN")
 
-      const msgRes = await fetch(
-        `/api/chat/session/${data.sessionId}/messages?visitorId=${encodeURIComponent(data.visitorId)}`
-      )
+      const msgRes = await fetch(`/api/chat/session/${data.sessionId}/messages`, {
+        credentials: "same-origin",
+      })
       if (msgRes.ok) {
         const msgData = await msgRes.json()
         const initialMessages = msgData.messages ?? []
@@ -148,17 +134,15 @@ export default function ChatBubble() {
 
   const loadStoredSession = useCallback(async () => {
     const sid = getStoredSessionId()
-    const vid = getOrCreateVisitorId()
-    if (!sid || !vid) {
+    if (!sid) {
       setShowForm(true)
       return
     }
-    setVisitorId(vid)
     setLoading(true)
     try {
-      const msgRes = await fetch(
-        `/api/chat/session/${sid}/messages?visitorId=${encodeURIComponent(vid)}`
-      )
+      const msgRes = await fetch(`/api/chat/session/${sid}/messages`, {
+        credentials: "same-origin",
+      })
       if (msgRes.ok) {
         setSessionId(sid)
         setShowForm(false)
@@ -180,10 +164,10 @@ export default function ChatBubble() {
   const sendMessage = useCallback(
     async (text?: string) => {
       const msg = (text ?? input.trim()).trim()
-      if (!msg || !sessionId || !visitorId || sending) return
+      if (!msg || !sessionId || sending) return
       setSending(true)
       setInput("")
-      const tempId = `tmp-${Date.now()}`
+      const tempId = `tmp-${crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`}`
       setMessages((prev) => [
         ...prev,
         { id: tempId, role: "VISITOR" as const, content: msg, createdAt: new Date().toISOString() },
@@ -192,7 +176,8 @@ export default function ChatBubble() {
         const res = await fetch(`/api/chat/session/${sessionId}/messages`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content: msg, visitorId }),
+          credentials: "same-origin",
+          body: JSON.stringify({ content: msg }),
         })
         if (res.ok) {
           const created = await res.json()
@@ -210,18 +195,17 @@ export default function ChatBubble() {
         setSending(false)
       }
     },
-    [input, sessionId, visitorId, sending]
+    [input, sessionId, sending]
   )
 
   const closeChat = useCallback(async () => {
-    if (!sessionId || !visitorId || closingChat) return
+    if (!sessionId || closingChat) return
     if (!window.confirm("¿Cerrar la conversación? No podrás enviar más mensajes.")) return
     setClosingChat(true)
     try {
       const res = await fetch(`/api/chat/session/${sessionId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visitorId }),
+        credentials: "same-origin",
       })
       if (res.ok) {
         setSessionStatus("CLOSED")
@@ -231,7 +215,7 @@ export default function ChatBubble() {
     } finally {
       setClosingChat(false)
     }
-  }, [sessionId, visitorId, closingChat])
+  }, [sessionId, closingChat])
 
   const openNewChat = useCallback(() => {
     if (typeof window !== "undefined") localStorage.removeItem(CHAT_SESSION_KEY)
@@ -258,16 +242,15 @@ export default function ChatBubble() {
   }, [open, showForm, loadStoredSession])
 
   useEffect(() => {
-    if (!open || !sessionId || !visitorId) return
+    if (!open || !sessionId) return
     const adminCount = messages.filter((m) => m.role === "ADMIN").length
     syncAdminReadState(adminCount)
-  }, [open, sessionId, visitorId, messages, syncAdminReadState])
+  }, [open, sessionId, messages, syncAdminReadState])
 
   // SSE stream
   useEffect(() => {
-    if (!open || !sessionId || !visitorId) return
-    const url = `/api/chat/session/${sessionId}/stream?visitorId=${encodeURIComponent(visitorId)}`
-    const es = new EventSource(url)
+    if (!open || !sessionId) return
+    const es = new EventSource(`/api/chat/session/${sessionId}/stream`, { withCredentials: true })
     es.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data) as {
@@ -300,22 +283,21 @@ export default function ChatBubble() {
     }
     es.onerror = () => {}
     return () => es.close()
-  }, [open, sessionId, visitorId])
+  }, [open, sessionId])
 
   // Poll when closed for badge count
   useEffect(() => {
     if (open) return
     const sid = getStoredSessionId()
-    const vid = getOrCreateVisitorId()
-    if (!sid || !vid) {
+    if (!sid) {
       setBadgeCount(0)
       return
     }
     const poll = async () => {
       try {
-        const res = await fetch(
-          `/api/chat/session/${sid}/messages?visitorId=${encodeURIComponent(vid)}`
-        )
+        const res = await fetch(`/api/chat/session/${sid}/messages`, {
+          credentials: "same-origin",
+        })
         if (res.ok) {
           const data = await res.json()
           const list = data.messages ?? []

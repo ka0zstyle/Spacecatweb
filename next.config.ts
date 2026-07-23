@@ -1,13 +1,21 @@
 import type { NextConfig } from "next";
+import path from "node:path";
+
+const devOrigins = (process.env.DEV_ORIGINS ?? "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: true,
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    remotePatterns: [],
   },
-  turbopack: {
-    root: process.cwd(),
-  },
-  allowedDevOrigins: ["http://192.168.0.197:3000", "192.168.0.197"],
+  poweredByHeader: false,
+  reactStrictMode: true,
+  allowedDevOrigins: devOrigins,
+  turbopack: { root: path.join(import.meta.dirname ?? __dirname, ".") },
 };
 
 export default nextConfig;

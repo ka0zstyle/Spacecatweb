@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
 import type { ReactNode } from "react"
 import Link from "next/link"
+import Script from "next/script"
 import { notFound } from "next/navigation"
 import { getLang } from "@/lib/lang"
-import { posts, getPostBySlug, getLocalePost } from "@/lib/blog-data"
+import { posts, getPostBySlug, getLocalePost, formatPostDate } from "@/lib/blog-data"
 import { Calendar, User, ArrowLeft, BookOpen } from "lucide-react"
 
 const baseUrl = "https://spacecatweb.com"
@@ -48,7 +49,13 @@ export async function generateMetadata({
       siteName: "SpaceCatWeb",
       locale: isEn ? "en_US" : "es_ES",
       type: "article",
-      publishedTime: post.date,
+      publishedTime: new Date(post.date).toISOString(),
+      authors: [post.author],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: localized.title,
+      description: localized.excerpt,
     },
   }
 }
@@ -169,8 +176,33 @@ export default async function BlogPostPage({
     .slice(0, 3)
     .map((p) => getLocalePost(p, typedLang))
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: localized.title,
+    description: localized.excerpt,
+    datePublished: new Date(post.date).toISOString(),
+    author: { "@type": "Person", name: post.author, url: baseUrl },
+    publisher: {
+      "@type": "Organization",
+      name: "SpaceCatWeb",
+      url: baseUrl,
+      logo: { "@type": "ImageObject", url: `${baseUrl}/assets/images/spacecatweblogo.png` },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${baseUrl}/blog/${slug}`,
+    },
+    inLanguage: typedLang,
+  }
+
   return (
     <div className="min-h-screen">
+      <Script
+        id={`schema-article-${slug}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
         <Link
           href={`/blog?lang=${locale}`}
@@ -187,7 +219,7 @@ export default async function BlogPostPage({
             </span>
             <span className="flex items-center gap-1">
               <Calendar size={12} />
-              {post.date}
+              {formatPostDate(post.date, typedLang)}
             </span>
             <span className="flex items-center gap-1">
               <User size={12} />
@@ -223,7 +255,7 @@ export default async function BlogPostPage({
                   <div className="w-full h-16 rounded-lg bg-gradient-to-br from-sc-primary/20 to-sc-accent/10 flex items-center justify-center mb-3">
                     <span className="text-xl font-black text-white/20">{op.category[0]}</span>
                   </div>
-                  <p className="text-xs text-sc-muted mb-1">{op.date}</p>
+                  <p className="text-xs text-sc-muted mb-1">{formatPostDate(op.date, typedLang)}</p>
                   <h4 className="text-sm font-semibold text-white group-hover:text-sc-primary transition-colors line-clamp-2">
                     {op.title}
                   </h4>

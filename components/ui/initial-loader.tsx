@@ -10,7 +10,7 @@ export default function InitialLoader() {
     const timer = setTimeout(() => {
       setIsHiding(true)
       setTimeout(() => setIsHidden(true), 500)
-    }, 1200)
+    }, 400)
     return () => clearTimeout(timer)
   }, [])
 

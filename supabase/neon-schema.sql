@@ -51,3 +51,12 @@ CREATE TABLE IF NOT EXISTS chat_messages (
 CREATE INDEX IF NOT EXISTS idx_chat_sessions_visitor ON chat_sessions (visitor_id);
 CREATE INDEX IF NOT EXISTS idx_chat_sessions_status ON chat_sessions (status);
 CREATE INDEX IF NOT EXISTS idx_chat_messages_session ON chat_messages (session_id, created_at);
+
+-- ── Telegram reply flow: persists inline-keyboard "reply:" state across
+-- serverless cold starts. chat_id is the Telegram chat that pressed the button.
+CREATE TABLE IF NOT EXISTS pending_replies (
+  chat_id    TEXT PRIMARY KEY,
+  short_id   TEXT NOT NULL,
+  name       TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);

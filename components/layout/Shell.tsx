@@ -1,6 +1,6 @@
 "use client"
 
-import { type ReactNode, useMemo, useEffect } from "react"
+import { type ReactNode, useMemo } from "react"
 import { useSearchParams } from "next/navigation"
 import { getLang } from "@/lib/lang"
 import { LangProvider, GameProvider } from "@/app/providers"
@@ -19,10 +19,6 @@ export default function Shell({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams()
   const locale = searchParams?.get("lang") ?? "es"
   const lang = useMemo(() => getLang(locale), [locale])
-
-  useEffect(() => {
-    document.documentElement.lang = locale
-  }, [locale])
 
   return (
     <LangProvider lang={lang} locale={locale}>

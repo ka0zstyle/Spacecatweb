@@ -1,16 +1,25 @@
 import { NextRequest, NextResponse } from "next/server"
 import sql from "@/lib/db"
+import { getOrCreateVisitorId } from "@/lib/visitor"
 
 const POLL_MS = 2500
 const HEARTBEAT_MS = 15000
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
-  if (signal.aborted) return Promise.reject(new Error("aborted"))
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
+    if (signal.aborted) return resolve()
     const t = setTimeout(() => {
-      if (signal.aborted) reject(new Error("aborted"))
-      else resolve()
+      clearTimeout(t)
+      resolve()
     }, ms)
+    signal.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(t)
+        resolve()
+      },
+      { once: true },
+    )
   })
 }
 
@@ -19,7 +28,7 @@ export async function GET(
   { params }: { params: Promise<{ sessionId: string }> }
 ) {
   const { sessionId } = await params
-  const visitorId = request.nextUrl.searchParams.get("visitorId") ?? undefined
+  const visitorId = await getOrCreateVisitorId()
 
   const session = await sql`
     SELECT visitor_id FROM chat_sessions WHERE id = ${sessionId}

@@ -11,7 +11,7 @@
   --color-sc-card: #3a3a3a;
   --color-sc-muted: #b8b8b8;
   --color-sc-border: rgba(211, 84, 0, 0.2);
-  --font-sans: "Poppins", system-ui, sans-serif;
+  --font-sans: var(--font-poppins), "Poppins", system-ui, sans-serif;
   --font-weight-display: 900;
   --font-weight-headline: 700;
   --font-weight-title: 600;

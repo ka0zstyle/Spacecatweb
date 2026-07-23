@@ -4,8 +4,8 @@ import sql from "@/lib/db"
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID
 
-// Estado en memoria para respuestas pendientes (único admin, requests secuenciales)
-const pendingReplies = new Map<string, { shortId: string; name: string }>()
+// Estado de respuestas pendientes persistido en Neon (sobrevive cold starts y
+// se comparte entre instancias serverless). Ver `pending_replies` en supabase/neon-schema.sql.
 
 async function sendTelegramMessage(chatId: string, text: string, extra: Record<string, unknown> = {}) {
   if (!TELEGRAM_BOT_TOKEN) return
@@ -79,7 +79,11 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ ok: true })
         }
         const name = session.visitor_name ?? "Visitante"
-        pendingReplies.set(fromChatId, { shortId, name })
+        await sql`
+          INSERT INTO pending_replies (chat_id, short_id, name)
+          VALUES (${fromChatId}, ${shortId}, ${name})
+          ON CONFLICT (chat_id) DO UPDATE SET short_id = EXCLUDED.short_id, name = EXCLUDED.name, created_at = NOW()
+        `
         await answerCallbackQuery(callbackQuery.id, `✏️ Ahora escribe tu respuesta para ${name}`)
         await sendTelegramMessage(
           fromChatId,
@@ -96,13 +100,13 @@ export async function POST(request: NextRequest) {
 
     // ── /cancelar — cancela respuesta pendiente ────────────────────────────
     if (text === "/cancelar") {
-      if (pendingReplies.has(fromChatId)) {
-        const pending = pendingReplies.get(fromChatId)!
-        pendingReplies.delete(fromChatId)
-        await sendTelegramMessage(
-          fromChatId,
-          `❌ Respuesta a *${escapeMarkdown(pending.name)}* cancelada\\.`
-        )
+      const cancelled = await sql`
+        DELETE FROM pending_replies WHERE chat_id = ${fromChatId}
+        RETURNING name
+      `
+      if (cancelled.length > 0) {
+        const name = (cancelled[0] as { name: string }).name
+        await sendTelegramMessage(fromChatId, `❌ Respuesta a *${escapeMarkdown(name)}* cancelada\\.`)
       } else {
         await sendTelegramMessage(fromChatId, "No hay ninguna respuesta pendiente\\.")
       }
@@ -256,10 +260,12 @@ export async function POST(request: NextRequest) {
       replyContent = replyMatch[2].trim()
     } else if (!text.startsWith("/")) {
       // Revisar si hay una respuesta pendiente por botón inline
-      const pending = pendingReplies.get(fromChatId)
-      if (pending) {
-        pendingReplies.delete(fromChatId)
-        shortId = pending.shortId
+      const pendingRows = await sql`
+        DELETE FROM pending_replies WHERE chat_id = ${fromChatId}
+        RETURNING short_id
+      `
+      if (pendingRows.length > 0) {
+        shortId = (pendingRows[0] as { short_id: string }).short_id
       }
       replyContent = text
     } else {
